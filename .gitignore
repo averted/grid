@@ -1,0 +1,8 @@
+# OS stuff
+.DS_Store
+Thumbs.db
+Desktop.ini
+.*.sw[a-z]
+
+# ignore backups
+_*
