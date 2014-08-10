@@ -1,0 +1,56 @@
+/**
+ *                            __           __
+ *     ____ __   _____  _____/ /____  ____/ /
+ *    / __ `/ | / / _ \/ ___/ __/ _ \/ __  / 
+ *   / /_/ /| |/ /  __/ /  / /_/  __/ /_/ /  
+ *   \__,_/ |___/\___/_/   \__/\___/\__,_/   
+ *   
+ *
+ */
+
+/* ===================================================
+   General Styles
+   =================================================== */
+body, html {
+    height:100%;
+    min-height:100%;
+    background-color:#000;
+    font-family:'OpenSansLight';
+}
+
+.big { font-size: 30px; color:#ffa500; padding:0; margin:0; }
+.small { font-size: 24px; }
+.tiny { font-size: 12px; }
+.hidden { display:none; }
+
+a { color:#33ccff; /*color:rgba(0,191,255,1);*/ text-decoration:none; 
+    -webkit-text-shadow: 0 2px 5px #000;
+    -moz-text-shadow: 0 2px 5px #000;
+    text-shadow: 0 2px 5px #000;
+}
+a:hover { color:#b1e31b; text-decoration:underline; }
+a:active { }
+a:visited { color:#33ccff; text-decoration:none;
+    -webkit-text-shadow: 0 2px 5px #000;
+    -moz-text-shadow: 0 2px 5px #000;
+    text-shadow: 0 2px 5px #000;
+}
+
+#preload {
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+/* ===================================================
+   Grid
+   =================================================== */
+
+.grid { width:516px; height:516px; background-image:url('/img/grid2.jpg'); border:1px solid #aaa; }
+
+.controls { width:516px; height:100px; border:1px solid #aaa; border-top:none; }
+.controls ul { padding:0; margin:0; color:#aaa; list-style:none; }
+.controls ul li { display:inline-block; border:1px solid #aaa; padding:5px; margin:10px; cursor:pointer; }
