@@ -22,7 +22,7 @@
         <ul>
             <li class="shape" data-type="triangle">triangle</li>
             <li class="shape" data-type="square">square</li>
-            <li class="shape" data-type="square-big">big_square</li>
+            <li class="shape" data-type="square2x">big_square</li>
         </ul>
     </div>
     <script src="/js/script.js"></script>
