@@ -52,6 +52,9 @@ function Shape(options) {
 Shape.prototype = {
     constructor: Shape,
 
+    /**
+     * Build Shape's wrapper.
+     */
     init: function() {
         // click ability, etc...
         this.wrapper = $('<div/>').addClass('grid-shape').css({
@@ -63,6 +66,9 @@ Shape.prototype = {
         });
     },
 
+    /**
+     * Enable dragging functionality and handle matrix adjustments.
+     */
     enableDrag: function() {
         var shape = this;
 
@@ -85,10 +91,9 @@ Shape.prototype = {
 
                 // move shape to new coords
                 if (Grid.willFitShape(shape, { x: newX, y: newY })) {
-                    Grid.drawShape(shape, { x: newX, y: newY });     // draw shape at new coordinates
+                    Grid.drawShape(shape, { x: newX, y: newY });    // draw shape at new coordinates
                 } else {
-                    // remove shape if there was a collision
-                    $(this).remove();
+                    $(this).remove();   // remove shape if there was a collision
                 }
 
                 // LOGGING
@@ -275,14 +280,14 @@ var Controls = {
      */
     init: function() {
         $('.shape').on('click', function() {
-            var data_type = $(this).attr('data-type');
+            var shape_type = $(this).attr('data-type');
 
             $.ajax({
                 url: '/js/shapes.json',
                 dataType: 'json',
                 async: false,
                 success: function(data) {
-                    Grid.addShape(new Shape(data.common[data_type]));
+                    Grid.addShape(new Shape(data.common[shape_type]));
                 }
             });
         });
