@@ -38,39 +38,15 @@ if (!Array.prototype.hasOwnProperty('forEach')) {
 /**
  * Shape
  */
-function Shape(type) {
-    this.type = type;
+function Shape(options) {
     this.wrapper = '';
-    this.area = 0;
-    this.width = 0;
-    this.height = 0;
-    this.offset = { x:0, y:0 };
-    this.src = '';
-    this.cells = [];
-
-    switch (type) {
-        case 'triangle':
-            this.width = 256;
-            this.height = 256;
-            this.area = (this.width * this.height) / 2;
-            this.cells = [ '02', '33', '54', '30' ];   // describes position of each cell
-            this.src = '/img/shape_triangle.png';
-            break;
-        case 'square':
-            this.width = 128;
-            this.height = 128;
-            this.src = '/img/shape_square.png';
-            this.cells = [ '50' ];
-            this.area = this.width * this.height;
-            break;
-        case 'square2x':
-            this.width = 256;
-            this.height = 256;
-            this.area = this.width * this.height;
-            this.cells = [ '52', '53', '54', '50' ];
-            this.src = '/img/shape_square_big.png';
-            break;
-    }
+    this.offset  = { x:0, y:0 };
+    this.type    = options.type;
+    this.area    = options.area;
+    this.width   = options.width;
+    this.height  = options.height;
+    this.img     = options.img; 
+    this.cells   = options.cells; 
 }
 
 Shape.prototype = {
@@ -81,30 +57,44 @@ Shape.prototype = {
         this.wrapper = $('<div/>').addClass('grid-shape').css({
             width: this.width,
             height: this.height,
-            backgroundImage: 'url(' + this.src + ')',
+            backgroundImage: 'url(' + this.img + ')',
         }).on('dblclick', function(e) {
             $(this).remove();
         });
     },
 
     enableDrag: function() {
-        var origTop  = this.wrapper.css('top'),
-            origLeft = this.wrapper.css('left');
+        var shape = this;
 
         this.wrapper.draggable({
             grid: [ 128, 128 ],
             containment: 'parent',
 
             start: function(e, ui) {
+                var y = (ui.originalPosition.top) / 128,
+                    x = (ui.originalPosition.left) / 128;
 
-            },
-
-            drag: function(e, ui) {
-
+                Grid.drawShape({ x: x, y: y }, shape, 'remove'); // remove shape from grid
             },
 
             stop: function(e, ui) {
+                var y    = (ui.originalPosition.top) / 128,
+                    x    = (ui.originalPosition.left) / 128,
+                    newY = (ui.offset.top - 1) / 128,
+                    newX = (ui.offset.left - 1) / 128;
 
+                // move shape to new coords
+                if (Grid.willFitShape(shape, { x: newX, y: newY })) {
+                    Grid.drawShape({ x: newX, y: newY }, shape);     // draw shape at new coordinates
+                } else {
+                    // remove shape if there was a collision
+                    $(this).remove();
+                }
+
+                // LOGGING
+                Grid.matrix.forEach(function(item, index) {
+                    console.log(item);
+                });
             },
         });
     }
@@ -117,15 +107,15 @@ var Grid = {
     content: $('.grid'),
     availableSpace: 266256,
     matrix: [ [ 0, 0, 0, 0 ],
-             [ 0, 0, 0, 0 ],
-             [ 0, 0, 0, 0 ],
-             [ 0, 0, 0, 0 ] ],
+              [ 0, 0, 0, 0 ],
+              [ 0, 0, 0, 0 ],
+              [ 0, 0, 0, 0 ] ],
 
     addShape: function(shape) {
         // check for available space
         if (!Grid.hasSpace(shape)) { alert('not enough space'); return false; }
 
-        // build shape
+        // build shape dom
         shape.init();
 
         // find starting location for shape 
@@ -137,27 +127,23 @@ var Grid = {
             return false;
         }
         
-        Grid.matrix.forEach(function(item, index) {
-            console.log(item);
-        });
-
         // add offset?
         shape.wrapper.css({
             top: shape.offset.y * 128 + 'px',
             left: shape.offset.x * 128 + 'px',
         });
 
-        // add to grid
+        // add shape dom to grid
         this.content.append(shape.wrapper);
-        this.availableSpace -= shape.area;
         shape.enableDrag();
     },
 
     findLocationForShape: function(shape) {
         for (var y = 0; y < 4; y++) {
             for (var x = 0; x < 4; x++) {
-                if (Grid.willFit(shape.cells[0].charAt(0), Grid.matrix[y][x])) {
-                    return { x: y, y: x }
+                //if (Grid.willFit(shape.cells[0].charAt(0), Grid.matrix[y][x])) {
+                if (Grid.willFitShape(shape, { x:x, y:y })) {
+                    return { x: x, y: y }
                 }
                 shape.offset.x++;
                 if (x == 3) shape.offset.x = 0;
@@ -168,19 +154,16 @@ var Grid = {
         return false;
     },
 
-    updateMatrix: function() {
-
-    },
-
-    drawShape: function(coords, shape) {
+    drawShape: function(coords, shape, remove) {
         var x = coords.x,
-            y = coords.y;
+            y = coords.y,
+            remove = (typeof remove === 'undefined') ? false : true; 
 
         shape.cells.forEach(function(item, index) {
             var cell      = item.charAt(0),
                 direction = item.charAt(1);
             
-            Grid.matrix[x][y] = cell; 
+            Grid.matrix[y][x] = remove ? (cell === '0' ? Grid.matrix[y][x] : 0) : (cell === '0' ? Grid.matrix[y][x] : cell); 
 
             switch (direction) {
                 case '1': y--; break; // top
@@ -189,20 +172,53 @@ var Grid = {
                 case '4': x--; break; // left
             }
         });
+
+        // manage Grid's available space
+        this.availableSpace = remove ? this.availableSpace + shape.area : this.availableSpace - shape.area;
     },
 
     willFit: function(cell, matrix_cell) {
         if (matrix_cell == 0) { return true; }
 
         switch (cell) {
-            case 0: return true;
-            case 1: if (matrix_cell == 3) { return true; }
-            case 2: if (matrix_cell == 4) { return true; }
-            case 3: if (matrix_cell == 1) { return true; }
-            case 4: if (matrix_cell == 2) { return true; }
+            case '0': return true;
+            case '1': if (matrix_cell == 3) { return true; }
+            case '2': if (matrix_cell == 4) { return true; }
+            case '3': if (matrix_cell == 1) { return true; }
+            case '4': if (matrix_cell == 2) { return true; }
             default:
                 return false;
         }
+    },
+
+    willFitShape: function(shape, coords) {
+        var x = coords.x,
+            y = coords.y,
+            result = true;
+
+        shape.cells.forEach(function(item, index) {
+            var cell      = item.charAt(0),
+                direction = item.charAt(1);
+
+            if (result == false) return false;
+
+            // check if shape is out of grid bounds
+            if (y < 0 || y > 3 || x < 0 || x > 3) 
+                return result = false;
+
+            // check if cell can physically fit into the matrix
+            if (!Grid.willFit(cell, Grid.matrix[y][x]))
+                return result = false;
+
+            switch (direction) {
+                case '1': y--; break; // top
+                case '2': x++; break; // right
+                case '3': y++; break; // bottom
+                case '4': x--; break; // left
+            }
+        });
+
+        return result;
     },
 
     hasSpace: function(shape) {
@@ -216,69 +232,18 @@ var Grid = {
 var Controls = {
     init: function() {
         $('.shape').on('click', function() {
-            Grid.addShape(new Shape($(this).attr('data-type')));
+            var data_type = $(this).attr('data-type');
+
+            $.ajax({
+                url: '/js/shapes.json',
+                dataType: 'json',
+                async: false,
+                success: function(data) {
+                    Grid.addShape(new Shape(data.common[data_type]));
+                }
+            });
         });
     },
 };
 
 Controls.init();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-var Shape = {
-    width: 0,
-    height: 0,
-    src: '',
-
-    init: function(type) {
-        switch (type) {
-            case 'triangle':
-                this.width = 256;
-                this.height = 256;
-                this.src = '/img/shape_triangle.png';
-                break;
-            case 'square':
-                this.width = 128;
-                this.height = 128;
-                this.src = '/img/shape_square.png';
-                break;
-            case 'square2x':
-                this.width = 256;
-                this.height = 256;
-                this.src = '/img/shape_square_big.png';
-                break;
-        }
-    },
-
-    factory: function(type) {
-        var instance = Object.create(Shape);
-        instance.init(type);
-
-        return instance;
-    },
-};
-
-var shape1 = Shape.factory('triangle');
-*/

@@ -1,0 +1,41 @@
+{
+    "common": {
+        "triangle": {
+            "type": "triangle",
+            "width": 256,
+            "height": 256,
+            "area": 32768,
+            "cells": [ "02", "33", "54", "30" ],
+            "img": "/img/shape_triangle.png"
+        },
+        
+        "square": {
+            "type": "square",
+            "width": 128,
+            "height": 128,
+            "area": 16384,
+            "cells": [ "50" ],
+            "img": "/img/shape_square.png"
+        },
+
+        "square2x": {
+            "type": "square2x",
+            "width": 256,
+            "height": 256,
+            "area": 65534,
+            "cells": [ "52", "53", "54", "50" ],
+            "img": "/img/shape_square2x.png"
+        },
+
+        "rectangle": {
+            "type": "rectangle",
+            "width": 256,
+            "height": 128,
+            "area": 32768,
+            "cells": [ "52", "50" ],
+            "img": "/img/shape_rectangle.png"
+        }
+    }
+}
+
+
