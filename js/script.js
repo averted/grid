@@ -36,7 +36,7 @@ if (!Array.prototype.hasOwnProperty('forEach')) {
 }
 
 /**
- * Shape
+ * Shape object constructor
  */
 function Shape(options) {
     this.wrapper = '';
@@ -74,7 +74,7 @@ Shape.prototype = {
                 var y = (ui.originalPosition.top) / 128,
                     x = (ui.originalPosition.left) / 128;
 
-                Grid.drawShape({ x: x, y: y }, shape, 'remove'); // remove shape from grid
+                Grid.drawShape(shape, { x: x, y: y }, 'remove'); // remove shape from grid
             },
 
             stop: function(e, ui) {
@@ -85,7 +85,7 @@ Shape.prototype = {
 
                 // move shape to new coords
                 if (Grid.willFitShape(shape, { x: newX, y: newY })) {
-                    Grid.drawShape({ x: newX, y: newY }, shape);     // draw shape at new coordinates
+                    Grid.drawShape(shape, { x: newX, y: newY });     // draw shape at new coordinates
                 } else {
                     // remove shape if there was a collision
                     $(this).remove();
@@ -111,6 +111,11 @@ var Grid = {
               [ 0, 0, 0, 0 ],
               [ 0, 0, 0, 0 ] ],
 
+    /**
+     * Build Shape and add it's DOM to Grid.
+     *
+     * @param  shape     Shape object
+     */
     addShape: function(shape) {
         // check for available space
         if (!Grid.hasSpace(shape)) { alert('not enough space'); return false; }
@@ -121,7 +126,7 @@ var Grid = {
         // find starting location for shape 
         var coords = Grid.findLocationForShape(shape);
         if (coords) {
-            Grid.drawShape(coords, shape);
+            Grid.drawShape(shape, coords);
         } else {
             alert('NO SPACE, try re-organizing?');
             return false;
@@ -138,13 +143,20 @@ var Grid = {
         shape.enableDrag();
     },
 
+    /**
+     * Find space in Grid to fit the shape.
+     *
+     * @param  shape                Shape object
+     * @return false | coords       Return X,Y coords if shape can fit in Grid, otherwise false
+     */
     findLocationForShape: function(shape) {
         for (var y = 0; y < 4; y++) {
             for (var x = 0; x < 4; x++) {
-                //if (Grid.willFit(shape.cells[0].charAt(0), Grid.matrix[y][x])) {
+                // attempt to draw shape at x, y
                 if (Grid.willFitShape(shape, { x:x, y:y })) {
                     return { x: x, y: y }
                 }
+
                 shape.offset.x++;
                 if (x == 3) shape.offset.x = 0;
             }
@@ -154,7 +166,14 @@ var Grid = {
         return false;
     },
 
-    drawShape: function(coords, shape, remove) {
+    /**
+     * Draw a shape in Grid's matrix.
+     *
+     * @param shape         Shape object
+     * @param coords        X,Y coords
+     * @param remove        Optional flag to remove a shape (default: false)
+     */
+    drawShape: function(shape, coords, remove) {
         var x = coords.x,
             y = coords.y,
             remove = (typeof remove === 'undefined') ? false : true; 
@@ -177,6 +196,12 @@ var Grid = {
         this.availableSpace = remove ? this.availableSpace + shape.area : this.availableSpace - shape.area;
     },
 
+    /**
+     * Check if cell can fit into matrix.
+     * 
+     * @param cell            Value to check (one of: [ 0, 1, 2, 3, 4, 5 ])
+     * @param matrix_cell     Value of current matrix cell
+     */
     willFit: function(cell, matrix_cell) {
         if (matrix_cell == 0) { return true; }
 
@@ -189,8 +214,16 @@ var Grid = {
             default:
                 return false;
         }
+
+        return false;
     },
 
+    /**
+     * Check if whole shape will fit into matrix.
+     * 
+     * @param shape     Shape object
+     * @param coords    X,Y coordiantes
+     */
     willFitShape: function(shape, coords) {
         var x = coords.x,
             y = coords.y,
@@ -221,6 +254,11 @@ var Grid = {
         return result;
     },
 
+    /**
+     * Check if Grid has enough available space for specified shape.
+     *
+     * @param shape     Shape object
+     */
     hasSpace: function(shape) {
         return this.availableSpace - shape.area >= 0 ? true : false;
     },
@@ -230,6 +268,11 @@ var Grid = {
  * Controls 
  */
 var Controls = {
+    /**
+     * Initialize controls.
+     *
+     * @constructor
+     */
     init: function() {
         $('.shape').on('click', function() {
             var data_type = $(this).attr('data-type');
