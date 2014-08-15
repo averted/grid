@@ -6,8 +6,14 @@
             "height": 256,
             "area": 32768,
             "cells": [ "02", "33", "54", "30" ],
-            "gems": [ "02", "03", "14", "00" ],
-            "img": "/img/shape_triangle.png"
+            "gems": [ 
+                {
+                    "type": "red",
+                    "offset": { "x": 1, "y": 1 }
+                }
+            ],
+            "img": "/img/shape_triangle.png",
+            "bonus": "none"
         },
         
         "square": {
@@ -17,6 +23,12 @@
             "area": 16384,
             "cells": [ "50" ],
             "gems": [ "10" ],
+            "gems": [ 
+                { 
+                    "type": "blue",
+                    "offset": { "x": 0, "y": 0 }
+                }
+            ],
             "img": "/img/shape_square.png"
         },
 
@@ -26,7 +38,24 @@
             "height": 256,
             "area": 65534,
             "cells": [ "52", "53", "54", "50" ],
-            "gems": [ "12", "23", "34", "40" ],
+            "gems": [ 
+                {
+                    "type": "red",
+                    "offset": { "x": 0, "y": 0 }
+                },
+                {
+                    "type": "green",
+                    "offset": { "x": 1, "y": 0 }
+                },
+                {
+                    "type": "blue",
+                    "offset": { "x": 1, "y": 1 }
+                },
+                {
+                    "type": "combo",
+                    "offset": { "x": 0, "y": 1 }
+                }
+            ],
             "img": "/img/shape_square2x.png"
         },
 
@@ -36,7 +65,16 @@
             "height": 128,
             "area": 32768,
             "cells": [ "52", "50" ],
-            "gems": [ "12", "20" ],
+            "gems": [ 
+                {
+                    "type": "red",
+                    "offset": { "x": 0, "y": 0 }
+                },
+                {
+                    "type": "green",
+                    "offset": { "x": 1, "y": 0 }
+                }
+            ],
             "img": "/img/shape_rectangle.png"
         }
     }

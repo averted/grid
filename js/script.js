@@ -36,7 +36,7 @@ if (!Array.prototype.hasOwnProperty('forEach')) {
 }
 
 /**
- * Shape object constructor
+ * Shape constructor.
  */
 function Shape(options) {
     this.wrapper = '';
@@ -57,9 +57,7 @@ Shape.prototype = {
      * Build Shape's wrapper.
      */
     init: function() {
-        var gemArray = [],
-            gemOffsetTop = 0,
-            gemOffsetLeft = 0;
+        var gemArray = [];
 
         // build shape DOM
         this.wrapper = $('<div/>').addClass('grid-shape').css({
@@ -72,50 +70,14 @@ Shape.prototype = {
 
         // build gems
         this.gems.forEach(function(item, index) {
-            var gemImg = 'url("/img/gem_green.png")';
+            // create new gem
+            var gem = new Gem(item);
 
-            switch (item.charAt(0)) {
-                case '0': gemImg = 'none'; break;
-                case '1': gemImg = 'url("/img/gem_green.png")'; break;
-                case '2': gemImg = 'url("/img/gem_blue.png")'; break;
-                case '3': gemImg = 'url("/img/gem_red.png")'; break;
-                case '4': gemImg = 'url("/img/gem_combo.png")'; break;
-            }
+            // build gem dom
+            gem.init();
 
-            var gem = $('<div/>').addClass('grid-shape-gem').css({
-                backgroundImage: gemImg,
-                top: gemOffsetTop + 'px',
-                left: gemOffsetLeft + 'px',
-            }).on('click', function(e) {
-                e.stopPropagation();
-
-                // show random gem (testing)
-                Gem.getRandom();
-                var sparkUrl = '';
-                switch (Math.floor(Math.random() * 3)) {
-                    case 0: sparkUrl = 'url("/img/spark_flatHealth.png")'; break;
-                    case 1: sparkUrl = 'url("/img/spark_flatPower.png")'; break;
-                    case 2: sparkUrl = 'url("/img/spark_flatHaste.png")'; break;
-                    default:
-                        sparkUrl = 'url("/img/spark_flatHealth.png")';
-                }
-
-                var spark = $('<div/>').addClass('grid-shape-gem-spark').css({
-                    backgroundImage: sparkUrl,
-                });
-
-                $(this).append(spark);
-            });
-
-            gemArray.push(gem);
-
-            // modify offset based on direction
-            switch (item.charAt(1)) {
-                case '1': gemOffsetTop -= 128; break; // top
-                case '2': gemOffsetLeft += 128; break; // right
-                case '3': gemOffsetTop += 128; break; // bottom
-                case '4': gemOffsetLeft -= 128; break; // left
-            }
+            // add to gem array
+            gemArray.push(gem.wrapper);
         });
 
         // add gems to shape
@@ -162,34 +124,107 @@ Shape.prototype = {
 };
 
 /**
- * Gem
+ * Gem constructor.
  */
-function Gem() {
-    this.img = '';
-    this.offset = { x:0, y:0 };
+function Gem(options) {
+    this.wrapper = '';
+    this.type = options.type; 
+    this.img = this.getImageFromType(this.type);
+    this.offset = { x:options.offset.x, y:options.offset.y };
+    this.spark = null;
 }
 
 Gem.prototype = {
     constructor: Gem,
 
-    getRandom: function() {
+    init: function() {
+        var gem = this;
 
+        this.wrapper = $('<div/>').addClass('grid-shape-gem').css({
+            backgroundImage: this.img,
+            top: this.offset.y * 128 + 'px',
+            left: this.offset.x * 128 + 'px',
+        }).on('click', function(e) {
+            e.stopPropagation();
+        
+            // get random spark (testing)
+            var type = '', spark = null;
+            switch (Math.floor(Math.random() * 3)) {
+                case 0: type = 'health'; break;
+                case 1: type = 'power'; break;
+                case 2: type = 'haste'; break;
+            }
+
+            // create new spark
+            spark = new Spark(type);
+            spark.init();
+
+            // add spark to gem
+            gem.addSpark(spark);
+
+            // dereference
+            spark = null;
+        });
     },
+
+    addSpark: function(spark) {
+        // add spark to Gem
+        this.spark = spark;
+
+        //add spark dom to gem
+        this.wrapper.html(spark.wrapper);
+    },
+
+    removeSpark: function() {
+        // remove spark and all its references from Gem
+        this.spark = null;
+        this.wrapper.html();
+    },
+
+    getImageFromType: function(type) {
+        var img = 'none';
+
+        switch (type) {
+            case 'red':   img = 'url("/img/gem_red.png")'; break;
+            case 'blue':  img = 'url("/img/gem_blue.png")'; break;
+            case 'green': img = 'url("/img/gem_green.png")'; break;
+            case 'combo': img = 'url("/img/gem_combo.png")'; break;
+        }
+
+        return img;
+    }
 }
 
 /**
- * Spark
+ * Spark constructor.
  */
-function Spark() {
-    this.offset = { x:0, y:0 };
+function Spark(type) {
+    this.name = '';
+    this.type = type; 
+    this.img = this.getImageFromType(this.type); 
+    this.wrapper = '';
 }
 
 Spark.prototype = {
     constructor: Spark,
 
-    getRandom: function() {
-
+    init: function() {
+        this.wrapper = $('<div/>').addClass('grid-shape-gem-spark').css({
+            backgroundImage: this.img,
+        });
     },
+
+    getImageFromType: function(type) {
+        var img = 'none';
+
+        switch (type) {
+            case 'power':   img = 'url("/img/spark_flatPower.png")'; break;
+            case 'haste':   img = 'url("/img/spark_flatHaste.png")'; break;
+            case 'health':  img = 'url("/img/spark_flatHealth.png")'; break;
+        }
+
+        return img;
+    }
 }
 
 /**
