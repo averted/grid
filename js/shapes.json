@@ -6,6 +6,7 @@
             "height": 256,
             "area": 32768,
             "cells": [ "02", "33", "54", "30" ],
+            "gems": [ "02", "03", "14", "00" ],
             "img": "/img/shape_triangle.png"
         },
         
@@ -15,6 +16,7 @@
             "height": 128,
             "area": 16384,
             "cells": [ "50" ],
+            "gems": [ "10" ],
             "img": "/img/shape_square.png"
         },
 
@@ -24,6 +26,7 @@
             "height": 256,
             "area": 65534,
             "cells": [ "52", "53", "54", "50" ],
+            "gems": [ "12", "23", "34", "40" ],
             "img": "/img/shape_square2x.png"
         },
 
@@ -33,6 +36,7 @@
             "height": 128,
             "area": 32768,
             "cells": [ "52", "50" ],
+            "gems": [ "12", "20" ],
             "img": "/img/shape_rectangle.png"
         }
     }

@@ -47,6 +47,7 @@ function Shape(options) {
     this.height  = options.height;
     this.img     = options.img; 
     this.cells   = options.cells; 
+    this.gems    = options.gems;
 }
 
 Shape.prototype = {
@@ -56,7 +57,11 @@ Shape.prototype = {
      * Build Shape's wrapper.
      */
     init: function() {
-        // click ability, etc...
+        var gemArray = [],
+            gemOffsetTop = 0,
+            gemOffsetLeft = 0;
+
+        // build shape DOM
         this.wrapper = $('<div/>').addClass('grid-shape').css({
             width: this.width,
             height: this.height,
@@ -64,6 +69,57 @@ Shape.prototype = {
         }).on('dblclick', function(e) {
             $(this).remove();
         });
+
+        // build gems
+        this.gems.forEach(function(item, index) {
+            var gemImg = 'url("/img/gem_green.png")';
+
+            switch (item.charAt(0)) {
+                case '0': gemImg = 'none'; break;
+                case '1': gemImg = 'url("/img/gem_green.png")'; break;
+                case '2': gemImg = 'url("/img/gem_blue.png")'; break;
+                case '3': gemImg = 'url("/img/gem_red.png")'; break;
+                case '4': gemImg = 'url("/img/gem_combo.png")'; break;
+            }
+
+            var gem = $('<div/>').addClass('grid-shape-gem').css({
+                backgroundImage: gemImg,
+                top: gemOffsetTop + 'px',
+                left: gemOffsetLeft + 'px',
+            }).on('click', function(e) {
+                e.stopPropagation();
+
+                // show random gem (testing)
+                Gem.getRandom();
+                var sparkUrl = '';
+                switch (Math.floor(Math.random() * 3)) {
+                    case 0: sparkUrl = 'url("/img/spark_flatHealth.png")'; break;
+                    case 1: sparkUrl = 'url("/img/spark_flatPower.png")'; break;
+                    case 2: sparkUrl = 'url("/img/spark_flatHaste.png")'; break;
+                    default:
+                        sparkUrl = 'url("/img/spark_flatHealth.png")';
+                }
+
+                var spark = $('<div/>').addClass('grid-shape-gem-spark').css({
+                    backgroundImage: sparkUrl,
+                });
+
+                $(this).append(spark);
+            });
+
+            gemArray.push(gem);
+
+            // modify offset based on direction
+            switch (item.charAt(1)) {
+                case '1': gemOffsetTop -= 128; break; // top
+                case '2': gemOffsetLeft += 128; break; // right
+                case '3': gemOffsetTop += 128; break; // bottom
+                case '4': gemOffsetLeft -= 128; break; // left
+            }
+        });
+
+        // add gems to shape
+        this.wrapper.append(gemArray);
     },
 
     /**
@@ -104,6 +160,37 @@ Shape.prototype = {
         });
     }
 };
+
+/**
+ * Gem
+ */
+function Gem() {
+    this.img = '';
+    this.offset = { x:0, y:0 };
+}
+
+Gem.prototype = {
+    constructor: Gem,
+
+    getRandom: function() {
+
+    },
+}
+
+/**
+ * Spark
+ */
+function Spark() {
+    this.offset = { x:0, y:0 };
+}
+
+Spark.prototype = {
+    constructor: Spark,
+
+    getRandom: function() {
+
+    },
+}
 
 /**
  * Grid
