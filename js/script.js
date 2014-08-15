@@ -54,12 +54,11 @@ Shape.prototype = {
     constructor: Shape,
 
     /**
-     * Build Shape's wrapper.
+     * Build Shape.
      */
     init: function() {
         var gemArray = [];
 
-        // build shape DOM
         this.wrapper = $('<div/>').addClass('grid-shape').css({
             width: this.width,
             height: this.height,
@@ -68,16 +67,12 @@ Shape.prototype = {
             $(this).remove();
         });
 
-        // build gems
+        // build Shape's gems
         this.gems.forEach(function(item, index) {
-            // create new gem
             var gem = new Gem(item);
 
-            // build gem dom
             gem.init();
-
-            // add to gem array
-            gemArray.push(gem.wrapper);
+            gemArray.push(gem.wrapper);     // add gem to gemArray
         });
 
         // add gems to shape
@@ -137,6 +132,9 @@ function Gem(options) {
 Gem.prototype = {
     constructor: Gem,
 
+    /**
+     * Build Gem.
+     */
     init: function() {
         var gem = this;
 
@@ -148,7 +146,7 @@ Gem.prototype = {
             e.stopPropagation();
         
             // get random spark (testing)
-            var type = '', spark = null;
+            var type = '';
             switch (Math.floor(Math.random() * 3)) {
                 case 0: type = 'health'; break;
                 case 1: type = 'power'; break;
@@ -156,7 +154,7 @@ Gem.prototype = {
             }
 
             // create new spark
-            spark = new Spark(type);
+            var spark = new Spark(type);
             spark.init();
 
             // add spark to gem
@@ -167,20 +165,35 @@ Gem.prototype = {
         });
     },
 
+    /**
+     * Add Spark to Gem.
+     *
+     * @param spark     Spark object
+     */
     addSpark: function(spark) {
-        // add spark to Gem
         this.spark = spark;
-
-        //add spark dom to gem
         this.wrapper.html(spark.wrapper);
+
+        return true;
     },
 
+    /**
+     * Remove Spark from Gem.
+     *
+     * @return true
+     */
     removeSpark: function() {
-        // remove spark and all its references from Gem
         this.spark = null;
         this.wrapper.html();
+
+        return true;
     },
 
+    /**
+     * Get image URL base on gem type.
+     * 
+     * @param type      Gem type
+     */
     getImageFromType: function(type) {
         var img = 'none';
 
@@ -208,12 +221,20 @@ function Spark(type) {
 Spark.prototype = {
     constructor: Spark,
 
+    /**
+     * Build Spark.
+     */
     init: function() {
         this.wrapper = $('<div/>').addClass('grid-shape-gem-spark').css({
             backgroundImage: this.img,
         });
     },
 
+    /**
+     * Get image URL base on spark type.
+     * 
+     * @param type      Spark type
+     */
     getImageFromType: function(type) {
         var img = 'none';
 
@@ -397,8 +418,6 @@ var Grid = {
 var Controls = {
     /**
      * Initialize controls.
-     *
-     * @constructor
      */
     init: function() {
         $('.shape').on('click', function() {
