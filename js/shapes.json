@@ -8,7 +8,7 @@
             "cells": [ "02", "33", "54", "30" ],
             "gems": [ 
                 {
-                    "type": "red",
+                    "color": "red",
                     "offset": { "x": 1, "y": 1 }
                 }
             ],
@@ -25,7 +25,7 @@
             "gems": [ "10" ],
             "gems": [ 
                 { 
-                    "type": "blue",
+                    "color": "blue",
                     "offset": { "x": 0, "y": 0 }
                 }
             ],
@@ -40,19 +40,19 @@
             "cells": [ "52", "53", "54", "50" ],
             "gems": [ 
                 {
-                    "type": "red",
+                    "color": "red",
                     "offset": { "x": 0, "y": 0 }
                 },
                 {
-                    "type": "green",
+                    "color": "green",
                     "offset": { "x": 1, "y": 0 }
                 },
                 {
-                    "type": "blue",
+                    "color": "blue",
                     "offset": { "x": 1, "y": 1 }
                 },
                 {
-                    "type": "combo",
+                    "color": "combo",
                     "offset": { "x": 0, "y": 1 }
                 }
             ],
@@ -67,17 +67,42 @@
             "cells": [ "52", "50" ],
             "gems": [ 
                 {
-                    "type": "red",
+                    "color": "red",
                     "offset": { "x": 0, "y": 0 }
                 },
                 {
-                    "type": "green",
+                    "color": "green",
                     "offset": { "x": 1, "y": 0 }
                 }
             ],
             "img": "/img/shape_rectangle.png"
+        },
+
+        "outrider": {
+            "type": "outrider",
+            "width": 256,
+            "height": 384,
+            "area": 65536,
+            "cells": [ "32", "23", "54", "53", "50" ],
+            "gems": [ 
+                {
+                    "color": "combo",
+                    "offset": { "x": 0.5, "y": 0.2 }
+                },
+                {
+                    "color": "green",
+                    "offset": { "x": 0, "y": 1 }
+                },
+                {
+                    "color": "green",
+                    "offset": { "x": 1, "y": 1 }
+                },
+                {
+                    "color": "combo",
+                    "offset": { "x": 0, "y": 2 }
+                }
+            ],
+            "img": "/img/shape_outrider.png"
         }
     }
 }
-
-

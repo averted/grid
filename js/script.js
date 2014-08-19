@@ -36,7 +36,7 @@ if (!Array.prototype.hasOwnProperty('forEach')) {
 }
 
 /**
- * Shape constructor.
+ * Shape constructor
  */
 function Shape(options) {
     this.wrapper = '';
@@ -48,16 +48,18 @@ function Shape(options) {
     this.img     = options.img; 
     this.cells   = options.cells; 
     this.gems    = options.gems;
+    this.Gems    = [];
 }
 
 Shape.prototype = {
     constructor: Shape,
 
     /**
-     * Build Shape.
+     * Build Shape
      */
     init: function() {
-        var gemArray = [];
+        var shape = this,
+            gemArray = [];
 
         this.wrapper = $('<div/>').addClass('grid-shape').css({
             width: this.width,
@@ -71,16 +73,24 @@ Shape.prototype = {
         this.gems.forEach(function(item, index) {
             var gem = new Gem(item);
 
+            // build gem and add to gemArray
             gem.init();
-            gemArray.push(gem.wrapper);     // add gem to gemArray
+            gemArray.push(gem.wrapper);
+
+            // assign Gem to Shape
+            gem.Shape = shape;
+            shape.Gems.push(gem);
+
+            // dereference
+            gem = null;
         });
 
-        // add gems to shape
+        // add gems to shape dom
         this.wrapper.append(gemArray);
     },
 
     /**
-     * Enable dragging functionality and handle matrix adjustments.
+     * Enable dragging functionality and handle matrix adjustments
      */
     enableDrag: function() {
         var shape = this;
@@ -93,7 +103,8 @@ Shape.prototype = {
                 var y = (ui.originalPosition.top) / 128,
                     x = (ui.originalPosition.left) / 128;
 
-                Grid.drawShape(shape, { x: x, y: y }, 'remove'); // remove shape from grid
+                // remove shape from matrix
+                Grid.drawShape(shape, { x: x, y: y }, 'remove');
             },
 
             stop: function(e, ui) {
@@ -104,9 +115,9 @@ Shape.prototype = {
 
                 // move shape to new coords
                 if (Grid.willFitShape(shape, { x: newX, y: newY })) {
-                    Grid.drawShape(shape, { x: newX, y: newY });    // draw shape at new coordinates
+                    Grid.drawShape(shape, { x: newX, y: newY });
                 } else {
-                    $(this).remove();   // remove shape if there was a collision
+                    $(this).remove();
                 }
 
                 // LOGGING
@@ -115,25 +126,47 @@ Shape.prototype = {
                 });
             },
         });
+    },
+
+    /**
+     * Check if Shape is completely filled with proper Gems
+     *
+     * @return true|false       Returns true if all gems match their corresponding socket's color
+     */
+    checkComplete: function() {
+        var result = true;
+
+        this.Gems.forEach(function(gem, index) {
+            if (gem.Spark) {
+                if (gem.Spark.color != gem.color && gem.color != 'combo') {
+                    result = false;
+                }
+            } else {
+                result = false;
+            }
+        });
+
+        return result;
     }
 };
 
 /**
- * Gem constructor.
+ * Gem constructor
  */
 function Gem(options) {
     this.wrapper = '';
-    this.type = options.type; 
-    this.img = this.getImageFromType(this.type);
+    this.color = options.color; 
+    this.img = this.getImage(this.color);
     this.offset = { x:options.offset.x, y:options.offset.y };
-    this.spark = null;
+    this.Spark = null;
+    this.Shape = null;
 }
 
 Gem.prototype = {
     constructor: Gem,
 
     /**
-     * Build Gem.
+     * Build Gem
      */
     init: function() {
         var gem = this;
@@ -166,38 +199,40 @@ Gem.prototype = {
     },
 
     /**
-     * Add Spark to Gem.
+     * Add Spark to Gem
      *
      * @param spark     Spark object
      */
     addSpark: function(spark) {
-        this.spark = spark;
+        this.Spark = spark;
         this.wrapper.html(spark.wrapper);
+
+        if (this.Shape.checkComplete()) { alert('Shape bonus activated.'); }
 
         return true;
     },
 
     /**
-     * Remove Spark from Gem.
+     * Remove Spark from Gem
      *
      * @return true
      */
     removeSpark: function() {
-        this.spark = null;
+        this.Spark = null;
         this.wrapper.html();
 
         return true;
     },
 
     /**
-     * Get image URL base on gem type.
+     * Get image URL based on gem color
      * 
-     * @param type      Gem type
+     * @param color      Gem color 
      */
-    getImageFromType: function(type) {
+    getImage: function(color) {
         var img = 'none';
 
-        switch (type) {
+        switch (color) {
             case 'red':   img = 'url("/img/gem_red.png")'; break;
             case 'blue':  img = 'url("/img/gem_blue.png")'; break;
             case 'green': img = 'url("/img/gem_green.png")'; break;
@@ -209,11 +244,12 @@ Gem.prototype = {
 }
 
 /**
- * Spark constructor.
+ * Spark constructor
  */
 function Spark(type) {
     this.name = '';
     this.type = type; 
+    this.color = this.getColorFromType(this.type);
     this.img = this.getImageFromType(this.type); 
     this.wrapper = '';
 }
@@ -222,7 +258,7 @@ Spark.prototype = {
     constructor: Spark,
 
     /**
-     * Build Spark.
+     * Build Spark
      */
     init: function() {
         this.wrapper = $('<div/>').addClass('grid-shape-gem-spark').css({
@@ -231,7 +267,7 @@ Spark.prototype = {
     },
 
     /**
-     * Get image URL base on spark type.
+     * Get image URL based on spark type
      * 
      * @param type      Spark type
      */
@@ -245,6 +281,23 @@ Spark.prototype = {
         }
 
         return img;
+    },
+
+    /**
+     * Get spark color based on type
+     * 
+     * @param type      Spark type
+     */
+    getColorFromType: function(type) {
+        var color = 'none';
+
+        switch (type) {
+            case 'power':   color = 'green'; break;
+            case 'haste':   color = 'blue'; break;
+            case 'health':  color = 'red'; break;
+        }
+
+        return color;
     }
 }
 
@@ -260,7 +313,7 @@ var Grid = {
               [ 0, 0, 0, 0 ] ],
 
     /**
-     * Build Shape and add it's DOM to Grid.
+     * Build Shape and add it's DOM to Grid
      *
      * @param  shape     Shape object
      */
@@ -292,7 +345,7 @@ var Grid = {
     },
 
     /**
-     * Find space in Grid to fit the shape.
+     * Find space in Grid to fit the shape
      *
      * @param  shape                Shape object
      * @return false | coords       Return X,Y coords if shape can fit in Grid, otherwise false
@@ -315,7 +368,7 @@ var Grid = {
     },
 
     /**
-     * Draw a shape in Grid's matrix.
+     * Draw a shape in Grid's matrix
      *
      * @param shape         Shape object
      * @param coords        X,Y coords
@@ -345,7 +398,7 @@ var Grid = {
     },
 
     /**
-     * Check if cell can fit into matrix.
+     * Check if cell can fit into matrix
      * 
      * @param cell            Value to check (one of: [ 0, 1, 2, 3, 4, 5 ])
      * @param matrix_cell     Value of current matrix cell
@@ -367,7 +420,7 @@ var Grid = {
     },
 
     /**
-     * Check if whole shape will fit into matrix.
+     * Check if whole shape will fit into matrix
      * 
      * @param shape     Shape object
      * @param coords    X,Y coordiantes
@@ -403,7 +456,7 @@ var Grid = {
     },
 
     /**
-     * Check if Grid has enough available space for specified shape.
+     * Check if Grid has enough available space for specified shape
      *
      * @param shape     Shape object
      */
@@ -417,7 +470,7 @@ var Grid = {
  */
 var Controls = {
     /**
-     * Initialize controls.
+     * Initialize controls
      */
     init: function() {
         $('.shape').on('click', function() {
