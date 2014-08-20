@@ -105,6 +105,9 @@ Shape.prototype = {
 
                 // remove shape from matrix
                 Grid.drawShape(shape, { x: x, y: y }, 'remove');
+
+                // add class to prevent default click event
+                $(this).addClass('shape-dragging');
             },
 
             stop: function(e, ui) {
@@ -176,8 +179,13 @@ Gem.prototype = {
             top: this.offset.y * 128 + 'px',
             left: this.offset.x * 128 + 'px',
         }).on('click', function(e) {
-            e.stopPropagation();
-        
+            // prevent default click event while dragging
+            var gemParent = $(this).parent();
+            if (gemParent.hasClass('shape-dragging')) {
+                gemParent.removeClass('shape-dragging');
+                return false;
+            }
+
             // get random spark (testing)
             var type = '';
             switch (Math.floor(Math.random() * 3)) {
