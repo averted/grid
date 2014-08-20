@@ -20,11 +20,11 @@
     </div>
     <div class="controls">
         <ul>
-            <li class="shape" data-type="triangle">triangle</li>
-            <li class="shape" data-type="square">square</li>
-            <li class="shape" data-type="square2x">big_square</li>
-            <li class="shape" data-type="rectangle">rectangle</li>
-            <li class="shape" data-type="outrider">outrider</li>
+            <li class="shape mini-triangle" data-type="triangle"></li>
+            <li class="shape mini-square" data-type="square"></li>
+            <li class="shape mini-square2x" data-type="square2x"></li>
+            <li class="shape mini-rectangle" data-type="rectangle"></li>
+            <li class="shape mini-outrider" data-type="outrider"></li>
         </ul>
     </div>
     <script src="/js/script.js"></script>
