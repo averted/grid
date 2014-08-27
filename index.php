@@ -15,7 +15,7 @@
 
 </head>
 <body>
-    <div class="grid">
+    <div class="grid" oncontextmenu="return false">
 
     </div>
     <div class="controls">
