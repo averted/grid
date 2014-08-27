@@ -41,6 +41,7 @@ if (!Array.prototype.hasOwnProperty('forEach')) {
 function Shape(options) {
     this.wrapper = '';
     this.offset  = { x:0, y:0 };
+    this.coords  = { x:0, y:0 };
     this.type    = options.type;
     this.area    = options.area;
     this.width   = options.width;
@@ -58,15 +59,17 @@ Shape.prototype = {
      * Build Shape
      */
     init: function() {
-        var shape = this,
+        var Shape = this,
             gemArray = [];
 
         this.wrapper = $('<div/>').addClass('grid-shape').css({
             width: this.width,
             height: this.height,
             backgroundImage: 'url(' + this.img + ')',
-        }).on('dblclick', function(e) {
-            $(this).remove();
+        }).on('mousedown', function(e) {
+            if (e.which == 3) {
+                Shape.rotate();
+            }
         });
 
         // build Shape's gems
@@ -78,8 +81,8 @@ Shape.prototype = {
             gemArray.push(gem.wrapper);
 
             // assign Gem to Shape
-            gem.Shape = shape;
-            shape.Gems.push(gem);
+            gem.Shape = Shape;
+            Shape.Gems.push(gem);
 
             // dereference
             gem = null;
@@ -87,6 +90,67 @@ Shape.prototype = {
 
         // add gems to shape dom
         this.wrapper.append(gemArray);
+    },
+
+    rotate: function() {
+        this.rotateWrapper();
+        this.rotateMatrix();
+
+        return true;
+    },
+
+    rotateMatrix: function() {
+        var rotatedCells = [];
+
+        this.cells.forEach(function(item, index, obj) {
+            var cell      = item.charAt(0),
+                newIndex  = index + 1 >= obj.length ? 0 : index + 1,
+                direction = obj[newIndex].charAt(1);
+            
+            switch (cell) {
+                case '1': cell = '4'; break;
+                case '2': cell = '1'; break;
+                case '3': cell = '2'; break;
+                case '4': cell = '3'; break;
+            }
+
+            rotatedCells[newIndex] = cell + direction;
+        });
+
+        // remove Shape from it's coords and draw a new one on top
+        Grid.drawShape(this, this.coords, 'remove');
+        this.cells = rotatedCells;
+        Grid.drawShape(this, this.coords);
+                
+        // LOGGING
+        Grid.matrix.forEach(function(item, index) {
+            console.log(item);
+        });
+
+        return true;
+    },
+
+    rotateWrapper: function() {
+        var angle = 0,
+            transform = this.wrapper.css("-webkit-transform") ||
+                        this.wrapper.css("-moz-transform")    ||
+                        this.wrapper.css("-ms-transform")     ||
+                        this.wrapper.css("-o-transform")      ||
+                        this.wrapper.css("transform");
+
+        if (transform !== 'none') {
+            var values = transform.split('(')[1].split(')')[0].split(','),
+                a = values[0],
+                b = values[1];
+
+            angle = Math.round(Math.atan2(b, a) * (180/Math.PI));
+        }
+
+        angle = angle < 0 ? angle += 360 : angle;
+
+        this.wrapper.css('transform', 'rotate(' + (angle + 90) + 'deg)');
+
+        return true;
     },
 
     /**
@@ -180,9 +244,9 @@ Gem.prototype = {
             left: this.offset.x * 128 + 'px',
         }).on('click', function(e) {
             // prevent default click event while dragging
-            var gemParent = $(this).parent();
-            if (gemParent.hasClass('shape-dragging')) {
-                gemParent.removeClass('shape-dragging');
+            var wrap = $(this).parent();
+            if (wrap.hasClass('shape-dragging')) {
+                wrap.removeClass('shape-dragging');
                 return false;
             }
 
@@ -367,7 +431,7 @@ var Grid = {
                 }
 
                 shape.offset.x++;
-                if (x == 3) shape.offset.x = 0;
+                if (x == 3) { shape.offset.x = 0; }
             }
             shape.offset.y++;
         }
@@ -380,18 +444,36 @@ var Grid = {
      *
      * @param shape         Shape object
      * @param coords        X,Y coords
-     * @param remove        Optional flag to remove a shape (default: false)
+     * @param flag          Optional flag to remove a shape (default: false)
      */
-    drawShape: function(shape, coords, remove) {
+    drawShape: function(shape, coords, flag) {
         var x = coords.x,
             y = coords.y,
-            remove = (typeof remove === 'undefined') ? false : true; 
+            remove = flag || false;
 
-        shape.cells.forEach(function(item, index) {
+        shape.cells.forEach(function(item, index, obj) {
             var cell      = item.charAt(0),
                 direction = item.charAt(1);
-            
-            Grid.matrix[y][x] = remove ? (cell === '0' ? Grid.matrix[y][x] : 0) : (cell === '0' ? Grid.matrix[y][x] : cell); 
+
+            switch (Grid.matrix[y][x]) {
+                case '1': if (cell === '3') { cell = '13'; } break;
+                case '2': if (cell === '4') { cell = '24'; } break;
+                case '3': if (cell === '1') { cell = '13'; } break;
+                case '4': if (cell === '2') { cell = '24'; } break;
+            }
+
+            if (remove) {
+                if (Grid.matrix[y][x].length == 2) {
+                    var first  = Grid.matrix[y][x].charAt(0),
+                        second = Grid.matrix[y][x].charAt(1);
+
+                    Grid.matrix[y][x] = first == cell ? second : first;
+                } else {
+                    Grid.matrix[y][x] = (cell === '0') ? Grid.matrix[y][x] : 0;
+                }
+            } else {
+                Grid.matrix[y][x] = cell === '0' ? Grid.matrix[y][x] : cell;
+            }
 
             switch (direction) {
                 case '1': y--; break; // top
@@ -400,6 +482,8 @@ var Grid = {
                 case '4': x--; break; // left
             }
         });
+
+        shape.coords = { x:coords.x, y:coords.y };
 
         // manage Grid's available space
         this.availableSpace = remove ? this.availableSpace + shape.area : this.availableSpace - shape.area;
@@ -416,10 +500,10 @@ var Grid = {
 
         switch (cell) {
             case '0': return true;
-            case '1': if (matrix_cell == 3) { return true; }
-            case '2': if (matrix_cell == 4) { return true; }
-            case '3': if (matrix_cell == 1) { return true; }
-            case '4': if (matrix_cell == 2) { return true; }
+            case '1': if (matrix_cell == 3) { return true; } break;
+            case '2': if (matrix_cell == 4) { return true; } break;
+            case '3': if (matrix_cell == 1) { return true; } break;
+            case '4': if (matrix_cell == 2) { return true; } break;
             default:
                 return false;
         }
@@ -442,15 +526,17 @@ var Grid = {
             var cell      = item.charAt(0),
                 direction = item.charAt(1);
 
-            if (result == false) return false;
+            if (result == false) { return false; }
 
             // check if shape is out of grid bounds
-            if (y < 0 || y > 3 || x < 0 || x > 3) 
+            if (y < 0 || y > 3 || x < 0 || x > 3) {
                 return result = false;
+            }
 
             // check if cell can physically fit into the matrix
-            if (!Grid.willFit(cell, Grid.matrix[y][x]))
+            if (!Grid.willFit(cell, Grid.matrix[y][x])) {
                 return result = false;
+            }
 
             switch (direction) {
                 case '1': y--; break; // top
