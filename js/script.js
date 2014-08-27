@@ -92,6 +92,9 @@ Shape.prototype = {
         this.wrapper.append(gemArray);
     },
 
+    /**
+     * Rotate Shape
+     */
     rotate: function() {
         this.rotateWrapper();
         this.rotateMatrix();
@@ -99,6 +102,9 @@ Shape.prototype = {
         return true;
     },
 
+    /**
+     * Rotate Shape's matrix in Grid
+     */
     rotateMatrix: function() {
         var rotatedCells = [];
 
@@ -130,6 +136,9 @@ Shape.prototype = {
         return true;
     },
 
+    /**
+     * Rotate Shape's wrapper (image)
+     */
     rotateWrapper: function() {
         var angle = 0,
             transform = this.wrapper.css("-webkit-transform") ||
