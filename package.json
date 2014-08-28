@@ -1,0 +1,15 @@
+{
+  "name": "grid",
+  "version": "1.0.0",
+  "description": "grid",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/averted/grid.git"
+  },
+  "author": "averted",
+  "license": "ISC",
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-concat": "^0.5.0"
+  }
+}

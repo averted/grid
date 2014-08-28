@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>drag</title>
+    <title>grid</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <!-- Styles -->
@@ -27,6 +27,9 @@
             <li class="shape mini-outrider" data-type="outrider"></li>
         </ul>
     </div>
-    <script src="/js/script.js"></script>
+    <script src="/js/grid-build.js"></script>
+    <script type="text/javascript">
+        Controls.init();
+    </script>
 </body>
 </html>
