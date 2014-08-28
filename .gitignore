@@ -6,3 +6,6 @@ Desktop.ini
 
 # ignore backups
 _*
+
+# npm
+node_modules
