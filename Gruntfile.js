@@ -6,7 +6,7 @@ module.exports = function(grunt) {
             },
             dist: {
                 src: [
-                    'util/extend',
+                    'util/polyfill',
                     'Grid',
                     'Controls',
                     'Gem',
