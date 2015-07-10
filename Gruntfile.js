@@ -15,7 +15,7 @@ module.exports = function(grunt) {
         ].map(function(file) {
           return 'src/'+file+'.js';
         }),
-        dest: 'js/build.js'
+        dest: 'js/grid.js'
       }
     }
   });

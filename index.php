@@ -8,7 +8,7 @@
     <!-- Styles -->
     <link href="/css/normalize.css" rel="stylesheet" media="screen">
     <link href="/css/style.css" rel="stylesheet" media="screen">
-    
+
     <!-- jQuery -->
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <script src="//code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
@@ -27,7 +27,7 @@
             <li class="shape mini-outrider" data-type="outrider"></li>
         </ul>
     </div>
-    <script src="/js/grid-build.js"></script>
+    <script src="/js/build.js"></script>
     <script type="text/javascript">
         Controls.init();
     </script>

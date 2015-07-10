@@ -1,5 +1,4 @@
 'use strict';
-
 /**
  * Extend prototype
  */
@@ -36,194 +35,214 @@ if (!Array.prototype.hasOwnProperty('forEach')) {
 }
 
 /**
- * Shape constructor
+ * Grid
  */
-function Shape(options) {
-  this.wrapper = '';
-  this.offset  = { x:0, y:0 };
-  this.coords  = { x:0, y:0 };
-  this.type  = options.type;
-  this.area  = options.area;
-  this.width   = options.width;
-  this.height  = options.height;
-  this.img   = options.img;
-  this.cells   = options.cells;
-  this.gems  = options.gems;
-  this.Gems  = [];
-}
-
-Shape.prototype = {
-  constructor: Shape,
+var Grid = {
+  content: $('.grid'),
+  availableSpace: 266256,
+  matrix: [
+    [ 0, 0, 0, 0 ],
+    [ 0, 0, 0, 0 ],
+    [ 0, 0, 0, 0 ],
+    [ 0, 0, 0, 0 ]
+  ],
 
   /**
-   * Build Shape
+   * Build Shape and add it's DOM to Grid
+   *
+   * @param  shape   Shape object
    */
-  init: function() {
-    var Shape = this,
-      gemArray = [];
+  addShape: function(shape) {
+    // check for available space
+    if (!Grid.hasSpace(shape)) { alert('not enough space'); return false; }
 
-    this.wrapper = $('<div/>').addClass('grid-shape').css({
-      width: this.width,
-      height: this.height,
-      backgroundImage: 'url(' + this.img + ')',
-    }).on('mousedown', function(e) {
-      if (e.which == 3) {
-        Shape.rotate();
-      }
-    });
+    // build shape dom
+    shape.init();
 
-    // build Shape's gems
-    this.gems.forEach(function(item, index) {
-      var gem = new Gem(item);
-
-      // build gem and add to gemArray
-      gem.init();
-      gemArray.push(gem.wrapper);
-
-      // assign Gem to Shape
-      gem.Shape = Shape;
-      Shape.Gems.push(gem);
-
-      // dereference
-      gem = null;
-    });
-
-    // add gems to shape dom
-    this.wrapper.append(gemArray);
-  },
-
-  /**
-   * Rotate Shape
-   */
-  rotate: function() {
-    this.rotateWrapper();
-    this.rotateMatrix();
-
-    return true;
-  },
-
-  /**
-   * Rotate Shape's matrix in Grid
-   */
-  rotateMatrix: function() {
-    var rotatedCells = [];
-
-    this.cells.forEach(function(item, index, obj) {
-      var cell    = item.charAt(0),
-        newIndex  = index + 1 >= obj.length ? 0 : index + 1,
-        direction = obj[newIndex].charAt(1);
-
-      switch (cell) {
-        case '1': cell = '4'; break;
-        case '2': cell = '1'; break;
-        case '3': cell = '2'; break;
-        case '4': cell = '3'; break;
-      }
-
-      rotatedCells[newIndex] = cell + direction;
-    });
-
-    // remove Shape from it's coords and draw a new one on top
-    Grid.drawShape(this, this.coords, 'remove');
-    this.cells = rotatedCells;
-    Grid.drawShape(this, this.coords);
-
-    // LOGGING
-    Grid.matrix.forEach(function(item, index) {
-      console.log(item);
-    });
-
-    return true;
-  },
-
-  /**
-   * Rotate Shape's wrapper (image)
-   */
-  rotateWrapper: function() {
-    var angle = 0,
-      transform = this.wrapper.css("-webkit-transform") ||
-            this.wrapper.css("-moz-transform")    ||
-            this.wrapper.css("-ms-transform")   ||
-            this.wrapper.css("-o-transform")    ||
-            this.wrapper.css("transform");
-
-    if (transform !== 'none') {
-      var values = transform.split('(')[1].split(')')[0].split(','),
-        a = values[0],
-        b = values[1];
-
-      angle = Math.round(Math.atan2(b, a) * (180/Math.PI));
+    // find starting location for shape
+    var coords = Grid.findLocationForShape(shape);
+    if (coords) {
+      Grid.drawShape(shape, coords);
+    } else {
+      alert('NO SPACE, try re-organizing?');
+      return false;
     }
 
-    angle = angle < 0 ? angle += 360 : angle;
+    // add offset?
+    shape.wrapper.css({
+      top: shape.offset.y * 128 + 'px',
+      left: shape.offset.x * 128 + 'px',
+    });
 
-    this.wrapper.css('transform', 'rotate(' + (angle + 90) + 'deg)');
-
-    return true;
+    // add shape dom to grid
+    this.content.append(shape.wrapper);
+    shape.enableDrag();
   },
 
   /**
-   * Enable dragging functionality and handle matrix adjustments
+   * Find space in Grid to fit the shape
+   *
+   * @param  shape        Shape object
+   * @return false | coords   Return X,Y coords if shape can fit in Grid, otherwise false
    */
-  enableDrag: function() {
-    var shape = this;
-
-    this.wrapper.draggable({
-      grid: [ 128, 128 ],
-      containment: 'parent',
-
-      start: function(e, ui) {
-        var y = (ui.originalPosition.top) / 128,
-          x = (ui.originalPosition.left) / 128;
-
-        // remove shape from matrix
-        Grid.drawShape(shape, { x: x, y: y }, 'remove');
-
-        // add class to prevent default click event
-        $(this).addClass('shape-dragging');
-      },
-
-      stop: function(e, ui) {
-        var y  = (ui.originalPosition.top) / 128,
-          x  = (ui.originalPosition.left) / 128,
-          newY = (ui.offset.top - 1) / 128,
-          newX = (ui.offset.left - 1) / 128;
-
-        // move shape to new coords
-        if (Grid.willFitShape(shape, { x: newX, y: newY })) {
-          Grid.drawShape(shape, { x: newX, y: newY });
-        } else {
-          $(this).remove();
+  findLocationForShape: function(shape) {
+    for (var y = 0; y < 4; y++) {
+      for (var x = 0; x < 4; x++) {
+        // attempt to draw shape at x, y
+        if (Grid.willFitShape(shape, { x:x, y:y })) {
+          return { x: x, y: y }
         }
 
-        // LOGGING
-        Grid.matrix.forEach(function(item, index) {
-          console.log(item);
-        });
-      },
-    });
+        shape.offset.x++;
+        if (x == 3) { shape.offset.x = 0; }
+      }
+      shape.offset.y++;
+    }
+
+    return false;
   },
 
   /**
-   * Check if Shape is completely filled with proper Gems
+   * Draw a shape in Grid's matrix
    *
-   * @return true|false   Returns true if all gems match their corresponding socket's color
+   * @param shape     Shape object
+   * @param coords    X,Y coords
+   * @param flag      Optional flag to remove a shape (default: false)
    */
-  checkComplete: function() {
-    var result = true;
+  drawShape: function(shape, coords, flag) {
+    var x = coords.x
+      , y = coords.y
+      , remove = flag || false;
 
-    this.Gems.forEach(function(gem, index) {
-      if (gem.Spark) {
-        if (gem.Spark.color != gem.color && gem.color != 'combo') {
-          result = false;
+    shape.cells.forEach(function(item, index, obj) {
+      var cell      = item.charAt(0)
+        , direction = item.charAt(1);
+
+      switch (Grid.matrix[y][x]) {
+        case '1': if (cell === '3') { cell = '13'; } break;
+        case '2': if (cell === '4') { cell = '24'; } break;
+        case '3': if (cell === '1') { cell = '13'; } break;
+        case '4': if (cell === '2') { cell = '24'; } break;
+      }
+
+      if (remove) {
+        if (Grid.matrix[y][x].length == 2) {
+          var first  = Grid.matrix[y][x].charAt(0),
+            second = Grid.matrix[y][x].charAt(1);
+
+          Grid.matrix[y][x] = first == cell ? second : first;
+        } else {
+          Grid.matrix[y][x] = (cell === '0') ? Grid.matrix[y][x] : 0;
         }
       } else {
-        result = false;
+        Grid.matrix[y][x] = cell === '0' ? Grid.matrix[y][x] : cell;
+      }
+
+      switch (direction) {
+        case '1': y--; break; // top
+        case '2': x++; break; // right
+        case '3': y++; break; // bottom
+        case '4': x--; break; // left
+      }
+    });
+
+    shape.coords = { x:coords.x, y:coords.y };
+
+    // manage Grid's available space
+    this.availableSpace = remove ? this.availableSpace + shape.area : this.availableSpace - shape.area;
+  },
+
+  /**
+   * Check if cell can fit into matrix
+   *
+   * @param cell        Value to check (one of: [ 0, 1, 2, 3, 4, 5 ])
+   * @param matrix_cell   Value of current matrix cell
+   */
+  willFit: function(cell, matrix_cell) {
+    if (matrix_cell == 0) { return true; }
+
+    switch (cell) {
+      case '0': return true;
+      case '1': if (matrix_cell == 3) { return true; } break;
+      case '2': if (matrix_cell == 4) { return true; } break;
+      case '3': if (matrix_cell == 1) { return true; } break;
+      case '4': if (matrix_cell == 2) { return true; } break;
+      default:
+        return false;
+    }
+
+    return false;
+  },
+
+  /**
+   * Check if whole shape will fit into matrix
+   *
+   * @param shape   Shape object
+   * @param coords  X,Y coordiantes
+   */
+  willFitShape: function(shape, coords) {
+    var x = coords.x
+      , y = coords.y
+      , result = true;
+
+    shape.cells.forEach(function(item, index) {
+      var cell    = item.charAt(0)
+        , direction = item.charAt(1);
+
+      if (result == false) { return false; }
+
+      // check if shape is out of grid bounds
+      if (y < 0 || y > 3 || x < 0 || x > 3) {
+        return result = false;
+      }
+
+      // check if cell can physically fit into the matrix
+      if (!Grid.willFit(cell, Grid.matrix[y][x])) {
+        return result = false;
+      }
+
+      switch (direction) {
+        case '1': y--; break; // top
+        case '2': x++; break; // right
+        case '3': y++; break; // bottom
+        case '4': x--; break; // left
       }
     });
 
     return result;
-  }
+  },
+
+  /**
+   * Check if Grid has enough available space for specified shape
+   *
+   * @param shape   Shape object
+   */
+  hasSpace: function(shape) {
+    return this.availableSpace - shape.area >= 0 ? true : false;
+  },
+};
+
+/**
+ * Controls
+ */
+var Controls = {
+  /**
+   * Initialize controls
+   */
+  init: function() {
+    $('.shape').on('click', function() {
+      var shape_type = $(this).attr('data-type');
+
+      $.ajax({
+        url: '/js/shapes.json',
+        dataType: 'json',
+        async: false,
+        success: function(data) {
+          Grid.addShape(new Shape(data.common[shape_type]));
+        }
+      });
+    });
+  },
 };
 
 /**
@@ -383,212 +402,192 @@ Spark.prototype = {
 }
 
 /**
- * Grid
+ * Shape constructor
  */
-var Grid = {
-  content: $('.grid'),
-  availableSpace: 266256,
-  matrix: [ [ 0, 0, 0, 0 ],
-        [ 0, 0, 0, 0 ],
-        [ 0, 0, 0, 0 ],
-        [ 0, 0, 0, 0 ] ],
+function Shape(options) {
+  this.wrapper = '';
+  this.offset  = { x:0, y:0 };
+  this.coords  = { x:0, y:0 };
+  this.type  = options.type;
+  this.area  = options.area;
+  this.width   = options.width;
+  this.height  = options.height;
+  this.img   = options.img;
+  this.cells   = options.cells;
+  this.gems  = options.gems;
+  this.Gems  = [];
+}
+
+Shape.prototype = {
+  constructor: Shape,
 
   /**
-   * Build Shape and add it's DOM to Grid
-   *
-   * @param  shape   Shape object
+   * Build Shape
    */
-  addShape: function(shape) {
-    // check for available space
-    if (!Grid.hasSpace(shape)) { alert('not enough space'); return false; }
+  init: function() {
+    var Shape = this
+      , gemArray = [];
 
-    // build shape dom
-    shape.init();
-
-    // find starting location for shape
-    var coords = Grid.findLocationForShape(shape);
-    if (coords) {
-      Grid.drawShape(shape, coords);
-    } else {
-      alert('NO SPACE, try re-organizing?');
-      return false;
-    }
-
-    // add offset?
-    shape.wrapper.css({
-      top: shape.offset.y * 128 + 'px',
-      left: shape.offset.x * 128 + 'px',
+    this.wrapper = $('<div/>').addClass('grid-shape').css({
+      width: this.width,
+      height: this.height,
+      backgroundImage: 'url(' + this.img + ')',
+    }).on('mousedown', function(e) {
+      if (e.which == 3) {
+        Shape.rotate();
+      }
     });
 
-    // add shape dom to grid
-    this.content.append(shape.wrapper);
-    shape.enableDrag();
+    // build Shape's gems
+    this.gems.forEach(function(item, index) {
+      var gem = new Gem(item);
+
+      // build gem and add to gemArray
+      gem.init();
+      gemArray.push(gem.wrapper);
+
+      // assign Gem to Shape
+      gem.Shape = Shape;
+      Shape.Gems.push(gem);
+
+      // dereference
+      gem = null;
+    });
+
+    // add gems to shape dom
+    this.wrapper.append(gemArray);
   },
 
   /**
-   * Find space in Grid to fit the shape
-   *
-   * @param  shape        Shape object
-   * @return false | coords   Return X,Y coords if shape can fit in Grid, otherwise false
+   * Rotate Shape
    */
-  findLocationForShape: function(shape) {
-    for (var y = 0; y < 4; y++) {
-      for (var x = 0; x < 4; x++) {
-        // attempt to draw shape at x, y
-        if (Grid.willFitShape(shape, { x:x, y:y })) {
-          return { x: x, y: y }
-        }
+  rotate: function() {
+    this.rotateWrapper();
+    this.rotateMatrix();
 
-        shape.offset.x++;
-        if (x == 3) { shape.offset.x = 0; }
+    return true;
+  },
+
+  /**
+   * Rotate Shape's matrix in Grid
+   */
+  rotateMatrix: function() {
+    var rotatedCells = [];
+
+    this.cells.forEach(function(item, index, obj) {
+      var cell      = item.charAt(0)
+        , newIndex  = index + 1 >= obj.length ? 0 : index + 1
+        , direction = obj[newIndex].charAt(1);
+
+      switch (cell) {
+        case '1': cell = '4'; break;
+        case '2': cell = '1'; break;
+        case '3': cell = '2'; break;
+        case '4': cell = '3'; break;
       }
-      shape.offset.y++;
+
+      rotatedCells[newIndex] = cell + direction;
+    });
+
+    // remove Shape from it's coords and draw a new one on top
+    Grid.drawShape(this, this.coords, 'remove');
+    this.cells = rotatedCells;
+    Grid.drawShape(this, this.coords);
+
+    // LOGGING
+    Grid.matrix.forEach(function(item, index) {
+      console.log(item);
+    });
+
+    return true;
+  },
+
+  /**
+   * Rotate Shape's wrapper (image)
+   */
+  rotateWrapper: function() {
+    var angle = 0
+      , transform = this.wrapper.css("-webkit-transform") ||
+            this.wrapper.css("-moz-transform")    ||
+            this.wrapper.css("-ms-transform")     ||
+            this.wrapper.css("-o-transform")      ||
+            this.wrapper.css("transform");
+
+    if (transform !== 'none') {
+      var values = transform.split('(')[1].split(')')[0].split(',')
+        , a = values[0]
+        , b = values[1];
+
+      angle = Math.round(Math.atan2(b, a) * (180/Math.PI));
     }
 
-    return false;
+    angle = angle < 0 ? angle += 360 : angle;
+
+    this.wrapper.css('transform', 'rotate(' + (angle + 90) + 'deg)');
+
+    return true;
   },
 
   /**
-   * Draw a shape in Grid's matrix
-   *
-   * @param shape     Shape object
-   * @param coords    X,Y coords
-   * @param flag      Optional flag to remove a shape (default: false)
+   * Enable dragging functionality and handle matrix adjustments
    */
-  drawShape: function(shape, coords, flag) {
-    var x = coords.x,
-      y = coords.y,
-      remove = flag || false;
+  enableDrag: function() {
+    var shape = this;
 
-    shape.cells.forEach(function(item, index, obj) {
-      var cell    = item.charAt(0),
-        direction = item.charAt(1);
+    this.wrapper.draggable({
+      grid: [ 128, 128 ],
+      containment: 'parent',
 
-      switch (Grid.matrix[y][x]) {
-        case '1': if (cell === '3') { cell = '13'; } break;
-        case '2': if (cell === '4') { cell = '24'; } break;
-        case '3': if (cell === '1') { cell = '13'; } break;
-        case '4': if (cell === '2') { cell = '24'; } break;
-      }
+      start: function(e, ui) {
+        var y = (ui.originalPosition.top) / 128,
+          x = (ui.originalPosition.left) / 128;
 
-      if (remove) {
-        if (Grid.matrix[y][x].length == 2) {
-          var first  = Grid.matrix[y][x].charAt(0),
-            second = Grid.matrix[y][x].charAt(1);
+        // remove shape from matrix
+        Grid.drawShape(shape, { x: x, y: y }, 'remove');
 
-          Grid.matrix[y][x] = first == cell ? second : first;
+        // add class to prevent default click event
+        $(this).addClass('shape-dragging');
+      },
+
+      stop: function(e, ui) {
+        var y  = (ui.originalPosition.top) / 128
+          , x  = (ui.originalPosition.left) / 128
+          , newY = (ui.offset.top - 1) / 128
+          , newX = (ui.offset.left - 1) / 128;
+
+        // move shape to new coords
+        if (Grid.willFitShape(shape, { x: newX, y: newY })) {
+          Grid.drawShape(shape, { x: newX, y: newY });
         } else {
-          Grid.matrix[y][x] = (cell === '0') ? Grid.matrix[y][x] : 0;
+          $(this).remove();
+        }
+
+        // LOGGING
+        Grid.matrix.forEach(function(item, index) {
+          console.log(item);
+        });
+      },
+    });
+  },
+
+  /**
+   * Check if Shape is completely filled with proper Gems
+   *
+   * @return true|false   Returns true if all gems match their corresponding socket's color
+   */
+  checkComplete: function() {
+    var result = true;
+
+    this.Gems.forEach(function(gem, index) {
+      if (gem.Spark) {
+        if (gem.Spark.color != gem.color && gem.color != 'combo') {
+          result = false;
         }
       } else {
-        Grid.matrix[y][x] = cell === '0' ? Grid.matrix[y][x] : cell;
-      }
-
-      switch (direction) {
-        case '1': y--; break; // top
-        case '2': x++; break; // right
-        case '3': y++; break; // bottom
-        case '4': x--; break; // left
-      }
-    });
-
-    shape.coords = { x:coords.x, y:coords.y };
-
-    // manage Grid's available space
-    this.availableSpace = remove ? this.availableSpace + shape.area : this.availableSpace - shape.area;
-  },
-
-  /**
-   * Check if cell can fit into matrix
-   *
-   * @param cell        Value to check (one of: [ 0, 1, 2, 3, 4, 5 ])
-   * @param matrix_cell   Value of current matrix cell
-   */
-  willFit: function(cell, matrix_cell) {
-    if (matrix_cell == 0) { return true; }
-
-    switch (cell) {
-      case '0': return true;
-      case '1': if (matrix_cell == 3) { return true; } break;
-      case '2': if (matrix_cell == 4) { return true; } break;
-      case '3': if (matrix_cell == 1) { return true; } break;
-      case '4': if (matrix_cell == 2) { return true; } break;
-      default:
-        return false;
-    }
-
-    return false;
-  },
-
-  /**
-   * Check if whole shape will fit into matrix
-   *
-   * @param shape   Shape object
-   * @param coords  X,Y coordiantes
-   */
-  willFitShape: function(shape, coords) {
-    var x = coords.x,
-      y = coords.y,
-      result = true;
-
-    shape.cells.forEach(function(item, index) {
-      var cell    = item.charAt(0),
-        direction = item.charAt(1);
-
-      if (result == false) { return false; }
-
-      // check if shape is out of grid bounds
-      if (y < 0 || y > 3 || x < 0 || x > 3) {
-        return result = false;
-      }
-
-      // check if cell can physically fit into the matrix
-      if (!Grid.willFit(cell, Grid.matrix[y][x])) {
-        return result = false;
-      }
-
-      switch (direction) {
-        case '1': y--; break; // top
-        case '2': x++; break; // right
-        case '3': y++; break; // bottom
-        case '4': x--; break; // left
+        result = false;
       }
     });
 
     return result;
-  },
-
-  /**
-   * Check if Grid has enough available space for specified shape
-   *
-   * @param shape   Shape object
-   */
-  hasSpace: function(shape) {
-    return this.availableSpace - shape.area >= 0 ? true : false;
-  },
+  }
 };
-
-/**
- * Controls
- */
-var Controls = {
-  /**
-   * Initialize controls
-   */
-  init: function() {
-    $('.shape').on('click', function() {
-      var shape_type = $(this).attr('data-type');
-
-      $.ajax({
-        url: '/js/shapes.json',
-        dataType: 'json',
-        async: false,
-        success: function(data) {
-          Grid.addShape(new Shape(data.common[shape_type]));
-        }
-      });
-    });
-  },
-};
-
-Controls.init();
