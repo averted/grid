@@ -8,7 +8,7 @@ Desktop.ini
 _*
 
 # build
-build.js
+build
 
 # npm
 node_modules
