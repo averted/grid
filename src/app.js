@@ -1,3 +1,6 @@
+import Grid from './grid';
+import Shape from './shape';
+
 /**
  * Define shapes
  */
@@ -111,11 +114,11 @@ var shapes = {
 };
 
 /**
- * Controls
+ * App
  */
-var Controls = {
+var App = {
   /**
-   * Initialize controls
+   * Initialize app
    */
   init: function() {
     $('.shape').on('click', function() {
@@ -125,4 +128,4 @@ var Controls = {
   },
 };
 
-Controls.init();
+App.init();

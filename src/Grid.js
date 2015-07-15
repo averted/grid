@@ -185,3 +185,5 @@ var Grid = {
     return this.availableSpace - shape.area >= 0 ? true : false;
   },
 };
+
+export default Grid;

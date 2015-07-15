@@ -95,3 +95,5 @@ Gem.prototype = {
     return img;
   }
 }
+
+export default Gem;

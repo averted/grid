@@ -55,3 +55,5 @@ Spark.prototype = {
     return color;
   }
 }
+
+export default Spark;

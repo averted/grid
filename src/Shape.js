@@ -1,3 +1,5 @@
+import Gem from './gem';
+
 /**
  * Shape constructor
  */
@@ -188,3 +190,5 @@ Shape.prototype = {
     return result;
   }
 };
+
+export default Shape;
