@@ -13,7 +13,7 @@ gulp.task('build', function() {
 
 gulp.task('browserify', ['build'], function() {
   return browserify({
-      entries: './build/app.js',
+      entries: './build/index.js',
     })
     .bundle()
     .pipe(source('bundle.js'))

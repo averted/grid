@@ -1,3 +1,5 @@
+import Notification from './notification';
+
 /**
  * Grid
  */
@@ -18,7 +20,13 @@ var Grid = {
    */
   addShape: function(shape) {
     // check for available space
-    if (!Grid.hasSpace(shape)) { alert('not enough space'); return false; }
+    if (!Grid.hasSpace(shape)) {
+      Notification.render({
+        msg: 'Not enough space',
+        type: 'error'
+      });
+      return false;
+    }
 
     // build shape dom
     shape.init();
@@ -28,7 +36,10 @@ var Grid = {
     if (coords) {
       Grid.drawShape(shape, coords);
     } else {
-      alert('NO SPACE, try re-organizing?');
+      Notification.render({
+        msg: 'NO SPACE, try re-organizing?',
+        type: 'error'
+      });
       return false;
     }
 

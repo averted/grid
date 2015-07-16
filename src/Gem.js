@@ -1,3 +1,6 @@
+import Spark from './spark';
+import Notification from './notification';
+
 /**
  * Gem constructor
  */
@@ -60,7 +63,12 @@ Gem.prototype = {
     this.Spark = spark;
     this.wrapper.html(spark.wrapper);
 
-    if (this.Shape.checkComplete()) { alert('Shape bonus activated.'); }
+    if (this.Shape.checkComplete()) {
+      Notification.render({
+        msg: 'Shape bonus activated',
+        type: 'success'
+      });
+    }
 
     return true;
   },
