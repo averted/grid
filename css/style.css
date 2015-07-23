@@ -67,21 +67,28 @@ a:visited { color:#33ccff; text-decoration:none;
 .grid-container .controls .mini-rectangle { background: url('../img/shape_rectangle_mini.png') bottom no-repeat; }
 .grid-container .controls .mini-outrider { height:75px; background-image: url('../img/shape_outrider_mini.png'); }
 
-.grid-notifications {
+#grid-notifications {
+
+}
+
+#grid-notifications .alert {
   color: #ff000;
   font-size: 20px;
   float: left;
   border: 1px solid #fff;
   margin: 20px 0 0 20px;
   padding: 20px;
+  opacity: 0;
+  transition: .5s all ease;
+}
+#grid-notifications .alert.success {
+  color: #00cc00;
+  opacity: 1;
+  border-color: #00cc00;
 }
 
-.grid-notifications.success {
-  color: green;
-  border-color: green;
-}
-
-.grid-notifications.error {
+#grid-notifications .alert.error {
   color: #ff0000;
+  opacity: 1;
   border-color: #ff0000;
 }
