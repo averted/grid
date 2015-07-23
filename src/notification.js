@@ -6,7 +6,7 @@ var Notification = {
   classList: [ 'error', 'success' ],
 
   render(options) {
-    return $(this.id).text(options.msg).removeClass(this.classList).addClass(options.type);
+    return $(this.id).text(options.msg).removeClass(this.classList.join(' ')).addClass(options.type);
   }
 };
 
