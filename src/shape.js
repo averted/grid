@@ -1,4 +1,5 @@
 import Gem from './gem';
+import Grid from './grid';
 
 /**
  * Shape constructor
