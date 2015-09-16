@@ -7,8 +7,5 @@ Desktop.ini
 # ignore backups
 _*
 
-# build
-build
-
 # npm
 node_modules
