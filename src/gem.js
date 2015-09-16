@@ -94,10 +94,10 @@ Gem.prototype = {
     var img = 'none';
 
     switch (color) {
-      case 'red':   img = 'url("/img/gem_red.png")'; break;
-      case 'blue':  img = 'url("/img/gem_blue.png")'; break;
-      case 'green': img = 'url("/img/gem_green.png")'; break;
-      case 'combo': img = 'url("/img/gem_combo.png")'; break;
+      case 'red':   img = 'url("img/gem_red.png")'; break;
+      case 'blue':  img = 'url("img/gem_blue.png")'; break;
+      case 'green': img = 'url("img/gem_green.png")'; break;
+      case 'combo': img = 'url("img/gem_combo.png")'; break;
     }
 
     return img;
