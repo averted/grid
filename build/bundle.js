@@ -112,13 +112,13 @@ Gem.prototype = {
 
     switch (color) {
       case 'red':
-        img = 'url("/img/gem_red.png")';break;
+        img = 'url("img/gem_red.png")';break;
       case 'blue':
-        img = 'url("/img/gem_blue.png")';break;
+        img = 'url("img/gem_blue.png")';break;
       case 'green':
-        img = 'url("/img/gem_green.png")';break;
+        img = 'url("img/gem_green.png")';break;
       case 'combo':
-        img = 'url("/img/gem_combo.png")';break;
+        img = 'url("img/gem_combo.png")';break;
     }
 
     return img;
@@ -401,7 +401,7 @@ var shapes = {
         'color': 'red',
         'offset': { 'x': 1, 'y': 1 }
       }],
-      'img': '/img/shape_triangle.png',
+      'img': 'img/shape_triangle.png',
       'bonus': 'none'
     },
 
@@ -416,7 +416,7 @@ var shapes = {
         'color': 'blue',
         'offset': { 'x': 0, 'y': 0 }
       }],
-      'img': '/img/shape_square.png'
+      'img': 'img/shape_square.png'
     },
 
     'square2x': {
@@ -438,7 +438,7 @@ var shapes = {
         'color': 'combo',
         'offset': { 'x': 0, 'y': 1 }
       }],
-      'img': '/img/shape_square2x.png'
+      'img': 'img/shape_square2x.png'
     },
 
     'rectangle': {
@@ -454,7 +454,7 @@ var shapes = {
         'color': 'green',
         'offset': { 'x': 1, 'y': 0 }
       }],
-      'img': '/img/shape_rectangle.png'
+      'img': 'img/shape_rectangle.png'
     },
 
     'outrider': {
@@ -476,7 +476,7 @@ var shapes = {
         'color': 'combo',
         'offset': { 'x': 0, 'y': 2 }
       }],
-      'img': '/img/shape_outrider.png'
+      'img': 'img/shape_outrider.png'
     }
   }
 };
@@ -793,11 +793,11 @@ Spark.prototype = {
 
     switch (type) {
       case 'power':
-        img = 'url("/img/spark_flatPower.png")';break;
+        img = 'url("img/spark_flatPower.png")';break;
       case 'haste':
-        img = 'url("/img/spark_flatHaste.png")';break;
+        img = 'url("img/spark_flatHaste.png")';break;
       case 'health':
-        img = 'url("/img/spark_flatHealth.png")';break;
+        img = 'url("img/spark_flatHealth.png")';break;
     }
 
     return img;

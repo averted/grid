@@ -25,7 +25,7 @@ var shapes = {
         'color': 'red',
         'offset': { 'x': 1, 'y': 1 }
       }],
-      'img': '/img/shape_triangle.png',
+      'img': 'img/shape_triangle.png',
       'bonus': 'none'
     },
 
@@ -40,7 +40,7 @@ var shapes = {
         'color': 'blue',
         'offset': { 'x': 0, 'y': 0 }
       }],
-      'img': '/img/shape_square.png'
+      'img': 'img/shape_square.png'
     },
 
     'square2x': {
@@ -62,7 +62,7 @@ var shapes = {
         'color': 'combo',
         'offset': { 'x': 0, 'y': 1 }
       }],
-      'img': '/img/shape_square2x.png'
+      'img': 'img/shape_square2x.png'
     },
 
     'rectangle': {
@@ -78,7 +78,7 @@ var shapes = {
         'color': 'green',
         'offset': { 'x': 1, 'y': 0 }
       }],
-      'img': '/img/shape_rectangle.png'
+      'img': 'img/shape_rectangle.png'
     },
 
     'outrider': {
@@ -100,7 +100,7 @@ var shapes = {
         'color': 'combo',
         'offset': { 'x': 0, 'y': 2 }
       }],
-      'img': '/img/shape_outrider.png'
+      'img': 'img/shape_outrider.png'
     }
   }
 };

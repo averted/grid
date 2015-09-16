@@ -111,13 +111,13 @@ Gem.prototype = {
 
     switch (color) {
       case 'red':
-        img = 'url("/img/gem_red.png")';break;
+        img = 'url("img/gem_red.png")';break;
       case 'blue':
-        img = 'url("/img/gem_blue.png")';break;
+        img = 'url("img/gem_blue.png")';break;
       case 'green':
-        img = 'url("/img/gem_green.png")';break;
+        img = 'url("img/gem_green.png")';break;
       case 'combo':
-        img = 'url("/img/gem_combo.png")';break;
+        img = 'url("img/gem_combo.png")';break;
     }
 
     return img;
