@@ -30,9 +30,9 @@ Spark.prototype = {
     var img = 'none';
 
     switch (type) {
-      case 'power': img = 'url("/img/spark_flatPower.png")'; break;
-      case 'haste': img = 'url("/img/spark_flatHaste.png")'; break;
-      case 'health':  img = 'url("/img/spark_flatHealth.png")'; break;
+      case 'power': img = 'url("img/spark_flatPower.png")'; break;
+      case 'haste': img = 'url("img/spark_flatHaste.png")'; break;
+      case 'health':  img = 'url("img/spark_flatHealth.png")'; break;
     }
 
     return img;

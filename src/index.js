@@ -18,7 +18,7 @@ var shapes = {
           "offset": { "x": 1, "y": 1 }
         }
       ],
-      "img": "/img/shape_triangle.png",
+      "img": "img/shape_triangle.png",
       "bonus": "none"
     },
 
@@ -35,7 +35,7 @@ var shapes = {
           "offset": { "x": 0, "y": 0 }
         }
       ],
-      "img": "/img/shape_square.png"
+      "img": "img/shape_square.png"
     },
 
     "square2x": {
@@ -62,7 +62,7 @@ var shapes = {
           "offset": { "x": 0, "y": 1 }
         }
       ],
-      "img": "/img/shape_square2x.png"
+      "img": "img/shape_square2x.png"
     },
 
     "rectangle": {
@@ -81,7 +81,7 @@ var shapes = {
           "offset": { "x": 1, "y": 0 }
         }
       ],
-      "img": "/img/shape_rectangle.png"
+      "img": "img/shape_rectangle.png"
     },
 
     "outrider": {
@@ -108,7 +108,7 @@ var shapes = {
           "offset": { "x": 0, "y": 2 }
         }
       ],
-      "img": "/img/shape_outrider.png"
+      "img": "img/shape_outrider.png"
     }
   }
 };
