@@ -519,12 +519,24 @@ var Notification = {
 
   render: function render(options) {
     var el = document.getElementById(this.id),
-        node = document.createElement('div');
+        node = document.createElement('div'),
+        msg = document.createElement('span'),
+        title = document.createElement('span');
 
-    node.className += this['class'] + ' ' + options.type;
-    node.innerHTML = '' + options.msg;
+    node.className = this['class'];
+    title.className = 'title';
+    msg.className = 'msg';
 
+    title.innerHTML = options.type.charAt(0).toUpperCase() + options.type.slice(1);
+    msg.innerHTML = options.msg;
+
+    node.appendChild(title);
+    node.appendChild(msg);
     el.insertBefore(node, el.firstChild);
+
+    setTimeout(function () {
+      node.className += ' ' + options.type;
+    }, 100);
 
     return this.setDuration();
   },
@@ -532,13 +544,14 @@ var Notification = {
   setDuration: function setDuration(time) {
     return setTimeout(function () {
       Notification.removeAlert();
-    }, time || 3000);
+    }, time || 4000);
   },
 
   removeAlert: function removeAlert() {
-    var lastAlert = _lodash2['default'].last(document.getElementsByClassName(this['class']));
+    var lastAlert = _lodash2['default'].last(document.getElementsByClassName(this['class'])),
+        notifications = document.getElementById(this.id);
 
-    return document.getElementById(this.id).removeChild(lastAlert);
+    notifications.removeChild(lastAlert);
   }
 };
 
