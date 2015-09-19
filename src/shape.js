@@ -151,8 +151,8 @@ Shape.prototype = {
       stop: function(e, ui) {
         var y  = (ui.originalPosition.top) / 128
           , x  = (ui.originalPosition.left) / 128
-          , newY = (ui.offset.top - 1) / 128
-          , newX = (ui.offset.left - 1) / 128;
+          , newY = (ui.position.top) / 128
+          , newX = (ui.position.left) / 128;
 
         // move shape to new coords
         if (Grid.willFitShape(shape, { x: newX, y: newY })) {
