@@ -1,5 +1,3 @@
-import _ from 'lodash';
-
 /**
  * Notifcation service.
  */
@@ -38,7 +36,8 @@ var Notification = {
   },
 
   removeAlert() {
-    var lastAlert = _.last(document.getElementsByClassName(this.class))
+    var alerts = document.getElementsByClassName(this.class)
+      , lastAlert = alerts[alerts.length - 1]
       , notifications = document.getElementById(this.id);
 
     notifications.removeChild(lastAlert);
