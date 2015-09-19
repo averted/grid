@@ -1,18 +1,11 @@
+/**
+ * Notifcation service.
+ */
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-var _lodash = require('lodash');
-
-var _lodash2 = _interopRequireDefault(_lodash);
-
-/**
- * Notifcation service.
- */
 var Notification = {
   id: 'grid-notifications',
   'class': 'alert',
@@ -48,7 +41,8 @@ var Notification = {
   },
 
   removeAlert: function removeAlert() {
-    var lastAlert = _lodash2['default'].last(document.getElementsByClassName(this['class'])),
+    var alerts = document.getElementsByClassName(this['class']),
+        lastAlert = alerts[alerts.length - 1],
         notifications = document.getElementById(this.id);
 
     notifications.removeChild(lastAlert);

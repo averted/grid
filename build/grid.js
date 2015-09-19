@@ -24,13 +24,8 @@ var Grid = {
    * @param  shape   Shape object
    */
   addShape: function addShape(shape) {
-    // check for available space
     if (!Grid.hasSpace(shape)) {
-      _notification2['default'].render({
-        msg: 'Not enough space',
-        type: 'error'
-      });
-      return false;
+      return _notification2['default'].render({ type: 'error', msg: 'Not enough space' });
     }
 
     // build shape dom
@@ -41,14 +36,10 @@ var Grid = {
     if (coords) {
       Grid.drawShape(shape, coords);
     } else {
-      _notification2['default'].render({
-        msg: 'NO SPACE, try re-organizing?',
-        type: 'error'
-      });
-      return false;
+      return _notification2['default'].render({ type: 'error', msg: 'NO SPACE, try re-organizing?' });
     }
 
-    // add offset?
+    // add offset relative to other shapes in grid
     shape.wrapper.css({
       top: shape.offset.y * 128 + 'px',
       left: shape.offset.x * 128 + 'px'
@@ -91,10 +82,11 @@ var Grid = {
    * @param coords    X,Y coords
    * @param flag      Optional flag to remove a shape (default: false)
    */
-  drawShape: function drawShape(shape, coords, flag) {
+  drawShape: function drawShape(shape, coords) {
+    var remove = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
+
     var x = coords.x,
-        y = coords.y,
-        remove = flag || false;
+        y = coords.y;
 
     shape.cells.forEach(function (item, index, obj) {
       var cell = item.charAt(0),

@@ -55,8 +55,7 @@ Shape.prototype = {
     this.gems.forEach(function (item, index) {
       var gem = new _gem2['default'](item);
 
-      // build gem and add to gemArray
-      gem.init();
+      // add to gemArray
       gemArray.push(gem.wrapper);
 
       // assign Gem to Shape
@@ -124,7 +123,7 @@ Shape.prototype = {
    */
   rotateWrapper: function rotateWrapper() {
     var angle = 0,
-        transform = this.wrapper.css('-webkit-transform') || this.wrapper.css('-moz-transform') || this.wrapper.css('-ms-transform') || this.wrapper.css('-o-transform') || this.wrapper.css('transform');
+        transform = this.wrapper.css("-webkit-transform") || this.wrapper.css("-moz-transform") || this.wrapper.css("-ms-transform") || this.wrapper.css("-o-transform") || this.wrapper.css("transform");
 
     if (transform !== 'none') {
       var values = transform.split('(')[1].split(')')[0].split(','),
@@ -165,8 +164,8 @@ Shape.prototype = {
       stop: function stop(e, ui) {
         var y = ui.originalPosition.top / 128,
             x = ui.originalPosition.left / 128,
-            newY = (ui.offset.top - 1) / 128,
-            newX = (ui.offset.left - 1) / 128;
+            newY = ui.position.top / 128,
+            newX = ui.position.left / 128;
 
         // move shape to new coords
         if (_grid2['default'].willFitShape(shape, { x: newX, y: newY })) {

@@ -11,20 +11,14 @@ function Spark(type) {
   this.type = type;
   this.color = this.getColorFromType(this.type);
   this.img = this.getImageFromType(this.type);
-  this.wrapper = '';
+
+  this.wrapper = $('<div/>').addClass('grid-shape-gem-spark').css({
+    backgroundImage: this.img
+  });
 }
 
 Spark.prototype = {
   constructor: Spark,
-
-  /**
-   * Build Spark
-   */
-  init: function init() {
-    this.wrapper = $('<div/>').addClass('grid-shape-gem-spark').css({
-      backgroundImage: this.img
-    });
-  },
 
   /**
    * Get image URL based on spark type
