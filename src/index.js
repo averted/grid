@@ -116,16 +116,10 @@ var shapes = {
 /**
  * App
  */
-var App = {
-  /**
-   * Initialize app
-   */
-  init: function() {
-    $('.shape').on('click', function() {
-      var shape_type = $(this).attr('data-type');
-      Grid.addShape(new Shape(shapes.common[shape_type]));
-    });
-  },
-};
+(function() {
+  $('.shape').on('click', function() {
+    var shape_type = $(this).attr('data-type');
 
-App.init();
+    Grid.addShape(new Shape(shapes.common[shape_type]));
+  });
+})();
