@@ -1,5 +1,4 @@
 var gulp       = require('gulp')
-  , concat     = require('gulp-concat')
   , connect    = require('gulp-connect')
   , babel      = require('gulp-babel')
   , browserify = require('browserify')
