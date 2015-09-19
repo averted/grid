@@ -38,21 +38,6 @@ Gem.prototype = {
   },
 
   /**
-   * Render random spark.
-   */
-  getRandomSpark() {
-    let type = null;
-
-    switch (Math.floor(Math.random() * 3)) {
-      case 0: type = 'health'; break;
-      case 1: type = 'power'; break;
-      case 2: type = 'haste'; break;
-    }
-
-    return new Spark(type);
-  },
-
-  /**
    * Add Spark to Gem
    *
    * @param spark   Spark object
@@ -62,10 +47,7 @@ Gem.prototype = {
     this.wrapper.html(spark.wrapper);
 
     if (this.Shape.checkComplete()) {
-      Notification.render({
-        msg: 'Shape bonus activated',
-        type: 'success'
-      });
+      Notification.render({ type: 'sucess', msg: 'Shape bonus activated' });
     }
 
     return true;
@@ -78,9 +60,22 @@ Gem.prototype = {
    */
   removeSpark: function() {
     this.Spark = null;
-    this.wrapper.html();
+    this.wrapper = null;
+  },
 
-    return true;
+  /**
+   * Render random spark.
+   */
+  getRandomSpark() {
+    let type = null;
+
+    switch (Math.floor(Math.random() * 3)) {
+      case 0: type = 'health'; break;
+      case 1: type = 'power'; break;
+      case 2: type = 'haste'; break;
+    }
+
+    return new Spark(type);
   },
 
   /**
