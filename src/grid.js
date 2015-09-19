@@ -19,13 +19,8 @@ var Grid = {
    * @param  shape   Shape object
    */
   addShape: function(shape) {
-    // check for available space
     if (!Grid.hasSpace(shape)) {
-      Notification.render({
-        msg: 'Not enough space',
-        type: 'error'
-      });
-      return false;
+      return Notification.render({ type: 'error', msg: 'Not enough space' });
     }
 
     // build shape dom
@@ -36,14 +31,10 @@ var Grid = {
     if (coords) {
       Grid.drawShape(shape, coords);
     } else {
-      Notification.render({
-        msg: 'NO SPACE, try re-organizing?',
-        type: 'error'
-      });
-      return false;
+      return Notification.render({ type: 'error', msg: 'NO SPACE, try re-organizing?' });
     }
 
-    // add offset?
+    // add offset relative to other shapes in grid
     shape.wrapper.css({
       top: shape.offset.y * 128 + 'px',
       left: shape.offset.x * 128 + 'px',
@@ -84,10 +75,9 @@ var Grid = {
    * @param coords    X,Y coords
    * @param flag      Optional flag to remove a shape (default: false)
    */
-  drawShape: function(shape, coords, flag) {
+  drawShape: function(shape, coords, remove = false) {
     var x = coords.x
-      , y = coords.y
-      , remove = flag || false;
+      , y = coords.y;
 
     shape.cells.forEach(function(item, index, obj) {
       var cell      = item.charAt(0)
@@ -102,8 +92,8 @@ var Grid = {
 
       if (remove) {
         if (Grid.matrix[y][x].length == 2) {
-          var first  = Grid.matrix[y][x].charAt(0),
-            second = Grid.matrix[y][x].charAt(1);
+          var first  = Grid.matrix[y][x].charAt(0)
+            , second = Grid.matrix[y][x].charAt(1);
 
           Grid.matrix[y][x] = first == cell ? second : first;
         } else {
