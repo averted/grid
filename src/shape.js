@@ -42,8 +42,7 @@ Shape.prototype = {
     this.gems.forEach(function(item, index) {
       var gem = new Gem(item);
 
-      // build gem and add to gemArray
-      gem.init();
+      // add to gemArray
       gemArray.push(gem.wrapper);
 
       // assign Gem to Shape

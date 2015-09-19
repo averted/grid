@@ -5,53 +5,51 @@ import Notification from './notification';
  * Gem constructor
  */
 function Gem(options) {
-  this.wrapper = '';
   this.color = options.color;
   this.img = this.getImage(this.color);
   this.offset = { x:options.offset.x, y:options.offset.y };
   this.Spark = null;
   this.Shape = null;
+
+  this.wrapper = $('<div/>').addClass('grid-shape-gem').css({
+    backgroundImage: this.img,
+    top: this.offset.y * 128 + 'px',
+    left: this.offset.x * 128 + 'px',
+  }).on('click', this.handleClick.bind(this));
 }
 
 Gem.prototype = {
   constructor: Gem,
 
   /**
-   * Build Gem
+   * Render random spark.
    */
-  init: function() {
-    var gem = this;
+  handleClick(e) {
+    let wrap = $(this.wrapper).parent();
 
-    this.wrapper = $('<div/>').addClass('grid-shape-gem').css({
-      backgroundImage: this.img,
-      top: this.offset.y * 128 + 'px',
-      left: this.offset.x * 128 + 'px',
-    }).on('click', function(e) {
-      // prevent default click event while dragging
-      var wrap = $(this).parent();
-      if (wrap.hasClass('shape-dragging')) {
-        wrap.removeClass('shape-dragging');
-        return false;
-      }
+    // prevent default click while dragging
+    if (wrap.hasClass('shape-dragging')) {
+      wrap.removeClass('shape-dragging');
+      return false;
+    }
 
-      // get random spark (testing)
-      var type = '';
-      switch (Math.floor(Math.random() * 3)) {
-        case 0: type = 'health'; break;
-        case 1: type = 'power'; break;
-        case 2: type = 'haste'; break;
-      }
+    // add spark to gem
+    this.addSpark(this.getRandomSpark());
+  },
 
-      // create new spark
-      var spark = new Spark(type);
-      spark.init();
+  /**
+   * Render random spark.
+   */
+  getRandomSpark() {
+    let type = null;
 
-      // add spark to gem
-      gem.addSpark(spark);
+    switch (Math.floor(Math.random() * 3)) {
+      case 0: type = 'health'; break;
+      case 1: type = 'power'; break;
+      case 2: type = 'haste'; break;
+    }
 
-      // dereference
-      spark = null;
-    });
+    return new Spark(type);
   },
 
   /**
