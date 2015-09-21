@@ -137,7 +137,7 @@ var _notification2 = _interopRequireDefault(_notification);
  * Grid
  */
 var Grid = {
-  content: $('.grid'),
+  wrapper: $('.grid'),
   availableSpace: 266256,
   matrix: [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]],
 
@@ -150,9 +150,6 @@ var Grid = {
     if (!Grid.hasSpace(shape)) {
       return _notification2['default'].render({ type: 'error', msg: 'Not enough space' });
     }
-
-    // build shape dom
-    shape.init();
 
     // find starting location for shape
     var coords = Grid.findLocationForShape(shape);
@@ -169,7 +166,7 @@ var Grid = {
     });
 
     // add shape dom to grid
-    this.content.append(shape.wrapper);
+    this.wrapper.append(shape.wrapper);
     shape.enableDrag();
   },
 
@@ -317,7 +314,7 @@ var Grid = {
       var cell = item.charAt(0),
           direction = item.charAt(1);
 
-      if (result == false) {
+      if (!result) {
         return false;
       }
 
@@ -478,7 +475,7 @@ var shapes = {
 })();
 },{"./grid":2,"./shape":5}],4:[function(require,module,exports){
 /**
- * Notifcation service.
+ * Notification service.
  */
 'use strict';
 
@@ -551,7 +548,6 @@ var _grid2 = _interopRequireDefault(_grid);
  * Shape constructor
  */
 function Shape(options) {
-  this.wrapper = '';
   this.offset = { x: 0, y: 0 };
   this.coords = { x: 0, y: 0 };
   this.type = options.type;
@@ -562,55 +558,53 @@ function Shape(options) {
   this.cells = options.cells;
   this.gems = options.gems;
   this.Gems = [];
+
+  var css = {
+    width: this.width,
+    height: this.height,
+    backgroundImage: 'url(' + this.img + ')'
+  };
+
+  this.wrapper = $('<div/>').addClass('grid-shape').css(css).on('mousedown', this.rotate.bind(this));
+
+  this.buildGems();
 }
 
 Shape.prototype = {
   constructor: Shape,
 
   /**
-   * Build Shape
+   * Build Shape's gems
    */
-  init: function init() {
-    var Shape = this,
-        gemArray = [];
+  buildGems: function buildGems() {
+    var _this = this;
 
-    this.wrapper = $('<div/>').addClass('grid-shape').css({
-      width: this.width,
-      height: this.height,
-      backgroundImage: 'url(' + this.img + ')'
-    }).on('mousedown', function (e) {
-      if (e.which == 3) {
-        Shape.rotate();
-      }
-    });
+    var gems = [];
 
-    // build Shape's gems
     this.gems.forEach(function (item, index) {
       var gem = new _gem2['default'](item);
 
-      // add to gemArray
-      gemArray.push(gem.wrapper);
+      gem.Shape = _this;
+      _this.Gems.push(gem);
 
-      // assign Gem to Shape
-      gem.Shape = Shape;
-      Shape.Gems.push(gem);
+      gems.push(gem.wrapper);
 
       // dereference
       gem = null;
     });
 
     // add gems to shape dom
-    this.wrapper.append(gemArray);
+    this.wrapper.append(gems);
   },
 
   /**
    * Rotate Shape
    */
-  rotate: function rotate() {
-    this.rotateWrapper();
-    this.rotateMatrix();
-
-    return true;
+  rotate: function rotate(e) {
+    if (e.which === 3) {
+      this.rotateWrapper();
+      this.rotateMatrix();
+    }
   },
 
   /**
@@ -668,9 +662,7 @@ Shape.prototype = {
 
     angle = angle < 0 ? angle += 360 : angle;
 
-    this.wrapper.css('transform', 'rotate(' + (angle + 90) + 'deg)');
-
-    return true;
+    return this.wrapper.css('transform', 'rotate(' + (angle + 90) + 'deg)');
   },
 
   /**
@@ -704,7 +696,7 @@ Shape.prototype = {
         if (_grid2['default'].willFitShape(shape, { x: newX, y: newY })) {
           _grid2['default'].drawShape(shape, { x: newX, y: newY });
         } else {
-          $(this).remove();
+          shape.destroy();
         }
 
         // LOGGING
@@ -734,6 +726,18 @@ Shape.prototype = {
     });
 
     return result;
+  },
+
+  /**
+   * Destroy shape
+   */
+  destroy: function destroy() {
+    this.gems = null;
+    this.Gems = null;
+    this.offset = null;
+    this.coords = null;
+
+    this.wrapper.remove();
   }
 };
 
@@ -754,9 +758,7 @@ function Spark(type) {
   this.color = this.getColorFromType(this.type);
   this.img = this.getImageFromType(this.type);
 
-  this.wrapper = $('<div/>').addClass('grid-shape-gem-spark').css({
-    backgroundImage: this.img
-  });
+  this.wrapper = $('<div/>').addClass('grid-shape-gem-spark').css({ backgroundImage: this.img });
 }
 
 Spark.prototype = {

@@ -1,5 +1,5 @@
 /**
- * Notifcation service.
+ * Notification service.
  */
 'use strict';
 
