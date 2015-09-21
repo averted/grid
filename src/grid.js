@@ -4,7 +4,7 @@ import Notification from './notification';
  * Grid
  */
 var Grid = {
-  content: $('.grid'),
+  wrapper: $('.grid'),
   availableSpace: 266256,
   matrix: [
     [ 0, 0, 0, 0 ],
@@ -23,9 +23,6 @@ var Grid = {
       return Notification.render({ type: 'error', msg: 'Not enough space' });
     }
 
-    // build shape dom
-    shape.init();
-
     // find starting location for shape
     var coords = Grid.findLocationForShape(shape);
     if (coords) {
@@ -41,7 +38,7 @@ var Grid = {
     });
 
     // add shape dom to grid
-    this.content.append(shape.wrapper);
+    this.wrapper.append(shape.wrapper);
     shape.enableDrag();
   },
 
@@ -151,10 +148,10 @@ var Grid = {
       , result = true;
 
     shape.cells.forEach(function(item, index) {
-      var cell    = item.charAt(0)
+      var cell = item.charAt(0)
         , direction = item.charAt(1);
 
-      if (result == false) { return false; }
+      if (!result) { return false; }
 
       // check if shape is out of grid bounds
       if (y < 0 || y > 3 || x < 0 || x > 3) {

@@ -7,9 +7,9 @@ function Spark(type) {
   this.color = this.getColorFromType(this.type);
   this.img = this.getImageFromType(this.type);
 
-  this.wrapper = $('<div/>').addClass('grid-shape-gem-spark').css({
-    backgroundImage: this.img,
-  });
+  this.wrapper = $('<div/>')
+    .addClass('grid-shape-gem-spark')
+    .css({ backgroundImage: this.img });
 }
 
 Spark.prototype = {
