@@ -1,5 +1,5 @@
 /**
- * Notifcation service.
+ * Notification service.
  */
 var Notification = {
   id: 'grid-notifications',
