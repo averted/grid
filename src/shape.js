@@ -5,66 +5,64 @@ import Grid from './grid';
  * Shape constructor
  */
 function Shape(options) {
-  this.wrapper = '';
-  this.offset  = { x:0, y:0 };
-  this.coords  = { x:0, y:0 };
-  this.type  = options.type;
-  this.area  = options.area;
-  this.width   = options.width;
-  this.height  = options.height;
-  this.img   = options.img;
-  this.cells   = options.cells;
-  this.gems  = options.gems;
-  this.Gems  = [];
+  this.offset = { x:0, y:0 };
+  this.coords = { x:0, y:0 };
+  this.type   = options.type;
+  this.area   = options.area;
+  this.width  = options.width;
+  this.height = options.height;
+  this.img    = options.img;
+  this.cells  = options.cells;
+  this.gems   = options.gems;
+  this.Gems   = [];
+
+  let css = {
+    width: this.width,
+    height: this.height,
+    backgroundImage: `url(${ this.img })`,
+  };
+
+  this.wrapper = $('<div/>')
+    .addClass('grid-shape')
+    .css(css)
+    .on('mousedown', this.rotate.bind(this));
+
+  this.buildGems();
 }
 
 Shape.prototype = {
   constructor: Shape,
 
   /**
-   * Build Shape
+   * Build Shape's gems
    */
-  init: function() {
-    var Shape = this
-      , gemArray = [];
+  buildGems: function() {
+    var gems = [];
 
-    this.wrapper = $('<div/>').addClass('grid-shape').css({
-      width: this.width,
-      height: this.height,
-      backgroundImage: 'url(' + this.img + ')',
-    }).on('mousedown', function(e) {
-      if (e.which == 3) {
-        Shape.rotate();
-      }
-    });
-
-    // build Shape's gems
-    this.gems.forEach(function(item, index) {
+    this.gems.forEach((item, index) => {
       var gem = new Gem(item);
 
-      // add to gemArray
-      gemArray.push(gem.wrapper);
+      gem.Shape = this;
+      this.Gems.push(gem);
 
-      // assign Gem to Shape
-      gem.Shape = Shape;
-      Shape.Gems.push(gem);
+      gems.push(gem.wrapper);
 
       // dereference
       gem = null;
     });
 
     // add gems to shape dom
-    this.wrapper.append(gemArray);
+    this.wrapper.append(gems);
   },
 
   /**
    * Rotate Shape
    */
-  rotate: function() {
-    this.rotateWrapper();
-    this.rotateMatrix();
-
-    return true;
+  rotate: function(e) {
+    if (e.which === 3) {
+      this.rotateWrapper();
+      this.rotateMatrix();
+    }
   },
 
   /**
@@ -107,10 +105,10 @@ Shape.prototype = {
   rotateWrapper: function() {
     var angle = 0
       , transform = this.wrapper.css("-webkit-transform") ||
-            this.wrapper.css("-moz-transform")    ||
-            this.wrapper.css("-ms-transform")     ||
-            this.wrapper.css("-o-transform")      ||
-            this.wrapper.css("transform");
+          this.wrapper.css("-moz-transform")    ||
+          this.wrapper.css("-ms-transform")     ||
+          this.wrapper.css("-o-transform")      ||
+          this.wrapper.css("transform");
 
     if (transform !== 'none') {
       var values = transform.split('(')[1].split(')')[0].split(',')
@@ -122,9 +120,7 @@ Shape.prototype = {
 
     angle = angle < 0 ? angle += 360 : angle;
 
-    this.wrapper.css('transform', 'rotate(' + (angle + 90) + 'deg)');
-
-    return true;
+    return this.wrapper.css('transform', 'rotate(' + (angle + 90) + 'deg)');
   },
 
   /**
@@ -158,7 +154,7 @@ Shape.prototype = {
         if (Grid.willFitShape(shape, { x: newX, y: newY })) {
           Grid.drawShape(shape, { x: newX, y: newY });
         } else {
-          $(this).remove();
+          shape.destroy();
         }
 
         // LOGGING
@@ -188,6 +184,18 @@ Shape.prototype = {
     });
 
     return result;
+  },
+
+  /**
+   * Destroy shape
+   */
+  destroy: function() {
+    this.gems = null;
+    this.Gems = null;
+    this.offset = null;
+    this.coords = null;
+
+    this.wrapper.remove();
   }
 };
 
