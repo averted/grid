@@ -47,7 +47,7 @@ Gem.prototype = {
     this.wrapper.html(spark.wrapper);
 
     if (this.Shape.checkComplete()) {
-      Notification.render({ type: 'sucess', msg: 'Shape bonus activated' });
+      Notification.render({ type: 'success', msg: 'Shape bonus activated' });
     }
 
     return true;
