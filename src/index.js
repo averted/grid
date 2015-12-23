@@ -1,5 +1,5 @@
-import Grid from './grid';
-import Shape from './shape';
+import Grid from  './app/grid';
+import Shape from './app/shape';
 
 /**
  * Define shapes

@@ -22,6 +22,8 @@ function Shape(options) {
     backgroundImage: `url(${ this.img })`,
   };
 
+  console.log('css', css)
+
   this.wrapper = $('<div/>')
     .addClass('grid-shape')
     .css(css)
